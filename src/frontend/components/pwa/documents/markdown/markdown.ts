@@ -1,5 +1,6 @@
 import MarkdownIt from 'markdown-it';
 import './markdown.css';
+import { setupHeadingTabs } from './tabs/tabs';
 
 const parser = new MarkdownIt({ html: false, linkify: false });
 
@@ -20,6 +21,7 @@ export const renderMarkdown = (
         resolveResource(image, 'src', base);
         image.loading = 'lazy';
     });
+    setupHeadingTabs(preview);
     return preview;
 };
 

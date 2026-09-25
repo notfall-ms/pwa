@@ -1,6 +1,8 @@
 import { renderMarkdown } from './markdown';
 
 // Normalize the real CommonJS parser for this project's Jest module interop.
+jest.mock('./tabs/tabs.css', () => ({}));
+
 jest.mock('markdown-it', () => ({
     __esModule: true,
     default: jest.requireActual('markdown-it'),

@@ -1,0 +1,35 @@
+.demo-reminder {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1050;
+    width: min(23rem, calc(100vw - 2rem));
+    padding: 1rem 1.25rem;
+    background: #fffaf0;
+    border: 1px solid #dfc57e;
+    border-radius: 1rem;
+    box-shadow: 0 12px 35px #56342426;
+    color: #5b4034;
+}
+.demo-reminder[hidden] {
+    display: none;
+}
+.demo-reminder > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.demo-reminder button {
+    border: 0;
+    border-radius: 50%;
+    background: #f6e8d6;
+    color: #6b3831;
+    width: 2rem;
+    height: 2rem;
+}
+.demo-reminder p {
+    margin: 0.75rem 0;
+}
+.demo-reminder a {
+    color: #943a35;
+}

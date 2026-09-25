@@ -1,0 +1,82 @@
+.preparedness-card {
+    max-width: 52rem;
+    margin: 2rem auto;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    border: 1px solid #eaddc6;
+    border-radius: 1.25rem;
+    background: linear-gradient(145deg, #fff, #fffaf0);
+    color: #57443a;
+}
+.preparedness-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.preparedness-heading h2 {
+    margin: 0.4rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 750;
+    color: #553a33;
+}
+.preparedness-caption {
+    font-size: 0.85rem;
+    color: #806e60;
+    margin-block: 0.75rem;
+}
+.preparedness-pill {
+    padding: 0.4rem 0.75rem;
+    border-radius: 2rem;
+    background: #fff0c9;
+    color: #79591d;
+    font-size: 0.8rem;
+}
+.preparedness-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+.preparedness-card button {
+    padding: 0.65rem 0.9rem;
+    background: #fff1d3;
+    border: 1px solid #e2c78c;
+    border-radius: 0.7rem;
+    color: #7c3b32;
+    font: inherit;
+    font-size: 0.85rem;
+}
+.preparedness-card button:disabled {
+    opacity: 0.55;
+}
+.preparedness-card a {
+    color: #963b36;
+    font-size: 0.85rem;
+}
+.preparedness-card :focus-visible {
+    outline: 2px solid #a8443c;
+    outline-offset: 3px;
+}
+.preparedness-card select {
+    display: block;
+    width: 100%;
+    padding: 0.7rem;
+    margin: 0.5rem 0 1rem;
+    border: 1px solid #e4d6c3;
+    border-radius: 0.7rem;
+    background: white;
+    color: #57443a;
+}
+
+.tracking-details {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+.tracking-details summary {
+    cursor: pointer;
+}
+.tracking-details p {
+    margin-block: 0.75rem;
+}

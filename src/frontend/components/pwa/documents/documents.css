@@ -24,7 +24,7 @@
     letter-spacing: -0.045em;
 }
 .pwa-documents h1 span {
-    color: #b84040;
+    color: var(--pwa-accent);
 }
 .pwa-document-count,
 .pwa-document-badge {
@@ -51,7 +51,7 @@
 }
 .pwa-documents article > a {
     font-weight: 700;
-    color: #7b3535;
+    color: var(--pwa-accent-dark);
     text-decoration: none;
     overflow-wrap: anywhere;
     min-width: 0;

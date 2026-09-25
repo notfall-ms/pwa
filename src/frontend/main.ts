@@ -1,3 +1,4 @@
+import { setupPager } from './components/pager/pager';
 import './_shared/index.css';
 import { setupSearch } from './components/molecules/search/search.molecule';
 import { setupPreparedness } from './components/preparedness/preparedness';
@@ -7,3 +8,5 @@ setupSearch();
 setupPwa();
 
 setupPreparedness();
+
+setupPager();

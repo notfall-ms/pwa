@@ -1,0 +1,16 @@
+:root {
+    --pwa-accent: #9b3434;
+    --pwa-accent-end: #8d3039;
+    --pwa-accent-dark: #6e3030;
+    --pwa-accent-soft: #fbe9e5;
+    --pwa-accent-shadow: #a9363620;
+    --pwa-accent-hover-shadow: #a9363630;
+}
+:root[data-preparedness='complete'] {
+    --pwa-accent: #24734e;
+    --pwa-accent-end: #195b3d;
+    --pwa-accent-dark: #24543c;
+    --pwa-accent-soft: #e5f3e9;
+    --pwa-accent-shadow: #24734e20;
+    --pwa-accent-hover-shadow: #24734e30;
+}

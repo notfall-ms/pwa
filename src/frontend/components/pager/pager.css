@@ -1,0 +1,23 @@
+.pager-message {
+    border-left: 3px solid #d9b551;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0 0.7rem 0.7rem 0;
+    background: #fff8e9;
+}
+.pager-message h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--pwa-accent-dark);
+    margin: 0 0 0.5rem;
+}
+.pager-message p {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.pager-message small {
+    display: inline-block;
+    color: #7c6b55;
+    margin-top: 0.5rem;
+}

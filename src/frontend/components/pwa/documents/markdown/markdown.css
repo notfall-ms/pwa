@@ -11,7 +11,7 @@
     overflow-wrap: anywhere;
 }
 .pwa-documents .pwa-markdown :is(h1, h2, h3, h4, h5, h6) {
-    color: #643b35;
+    color: var(--pwa-accent-dark);
     margin: 1.25rem 0 0.6rem;
     font-weight: 700;
     letter-spacing: normal;
@@ -32,7 +32,7 @@
     margin-bottom: 0;
 }
 .pwa-markdown a {
-    color: #9b3434;
+    color: var(--pwa-accent);
     text-underline-offset: 0.2em;
 }
 .pwa-markdown blockquote {
@@ -42,7 +42,7 @@
     background: #fffbef;
 }
 .pwa-markdown code {
-    color: #813c34;
+    color: var(--pwa-accent-dark);
     background: #fff6df;
     padding: 0.15rem 0.3rem;
     border-radius: 0.25rem;

@@ -44,7 +44,7 @@
     background: #fff1d3;
     border: 1px solid #e2c78c;
     border-radius: 0.7rem;
-    color: #7c3b32;
+    color: var(--pwa-accent-dark);
     font: inherit;
     font-size: 0.85rem;
 }
@@ -52,11 +52,11 @@
     opacity: 0.55;
 }
 .preparedness-card a {
-    color: #963b36;
+    color: var(--pwa-accent);
     font-size: 0.85rem;
 }
 .preparedness-card :focus-visible {
-    outline: 2px solid #a8443c;
+    outline: 2px solid var(--pwa-accent);
     outline-offset: 3px;
 }
 .preparedness-card select {

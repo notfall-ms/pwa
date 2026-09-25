@@ -19,3 +19,5 @@
 * [PWA and offline documents](docs/pwa.md) - setup, caching and installation
 
 * [Preparedness tools and tracking mock](docs/preparedness.md) - tabs, checklist, location and backend contract
+
+* [JSON pager and cache controls](docs/pager.md) - messages, offline updates and completion theme

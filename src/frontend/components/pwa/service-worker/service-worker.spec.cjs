@@ -12,6 +12,8 @@ const createWorker = (options = {}) => {
         viteOrigin: 'http://localhost:3000',
         cacheName: 'notfall-ms-current',
         cachePrefix: 'notfall-ms-',
+        pagerPath: '/assets/pager.json',
+        pagerCacheName: 'notfall-ms-pager-v1',
         documentsPath: '/documents/',
         documents: ['/documents/beispiel.txt'],
         precache: ['/', '/assets/main.js', '/documents/beispiel.txt'],
@@ -46,6 +48,7 @@ const createWorker = (options = {}) => {
                 'notfall-ms-old',
                 metadata.cacheName,
                 'another-app',
+                metadata.pagerCacheName,
             ],
             delete: async (key) => deleted.push(key),
         },
@@ -206,4 +209,13 @@ test('development bypasses BrowserSync and unrelated endpoints', () => {
     );
     assert.equal(worker.fetch('/api/example'), undefined);
     assert.equal(worker.fetch('http://localhost:3000/healthz'), undefined);
+});
+
+test('lets the pager validate its own fresh feed in production and development', () => {
+    for (const development of [false, true]) {
+        assert.equal(
+            createWorker({ development }).fetch('/assets/pager.json'),
+            undefined
+        );
+    }
 });

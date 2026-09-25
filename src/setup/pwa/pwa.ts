@@ -31,8 +31,9 @@ const writeWorker = (documents: string[], development: boolean): void => {
     const root = config.OUTPUT_DIR;
     const assets = listFiles(root).filter(
         (file) =>
-            /\.(html|css|js|svg|png|webmanifest)$/.test(file) &&
-            relative(root, file) !== 'sw.js'
+            file === join(root, pwaConfig.pagerPath.slice(1)) ||
+            (/\.(html|css|js|svg|png|webmanifest)$/.test(file) &&
+                relative(root, file) !== 'sw.js')
     );
     const precache = [
         ...new Set([

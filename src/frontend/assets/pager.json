@@ -1,0 +1,10 @@
+{
+    "messages": [
+        {
+            "id": "suppe-digitalhub-demo",
+            "title": "Warme Suppe am Digitalhub",
+            "text": "Um 19 Uhr gibt es warme Suppe am Digitalhub.",
+            "demo": true
+        }
+    ]
+}

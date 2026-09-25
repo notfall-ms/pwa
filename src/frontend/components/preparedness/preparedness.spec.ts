@@ -7,6 +7,7 @@ import { track, setTrackingEnabled } from './tracking/tracking';
 import { getMockEvents } from './tracking/mock-client/mock-client';
 
 jest.mock('./preparedness.css', () => ({}));
+jest.mock('./theme/theme.css', () => ({}));
 jest.mock('./checklist/checklist.css', () => ({}));
 jest.mock('./reminders/reminders.css', () => ({}));
 jest.mock('../pwa/install/install.css', () => ({}));

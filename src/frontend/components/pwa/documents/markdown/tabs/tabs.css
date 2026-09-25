@@ -19,12 +19,12 @@
 .document-tabs [aria-selected='true'] {
     background: #fff0c2;
     border-color: #cc9c35;
-    color: #783735;
+    color: var(--pwa-accent-dark);
     font-weight: 700;
 }
 .document-tabs [role='tab']:focus-visible,
 .document-tab-panel:focus-visible {
-    outline: 2px solid #ae4540;
+    outline: 2px solid var(--pwa-accent);
     outline-offset: 3px;
 }
 .document-tab-panel[hidden] {

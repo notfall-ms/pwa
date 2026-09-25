@@ -23,7 +23,7 @@
     border: 0;
     border-radius: 50%;
     background: #f6e8d6;
-    color: #6b3831;
+    color: var(--pwa-accent-dark);
     width: 2rem;
     height: 2rem;
 }
@@ -31,5 +31,5 @@
     margin: 0.75rem 0;
 }
 .demo-reminder a {
-    color: #943a35;
+    color: var(--pwa-accent);
 }

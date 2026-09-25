@@ -18,16 +18,16 @@
     display: flex;
     gap: 0.6rem;
     align-items: center;
-    color: #6e3030;
+    color: var(--pwa-accent-dark);
     font-size: 1.15rem;
     font-weight: 800;
     text-decoration: none;
 }
 .pwa-brand:hover {
-    color: #a93636;
+    color: var(--pwa-accent);
 }
 .pwa-brand-suffix {
-    color: #b13737;
+    color: var(--pwa-accent);
 }
 .pwa-indicators {
     display: flex;
@@ -49,11 +49,11 @@
     color: #75602a;
 }
 .pwa-status [data-offline='true'] {
-    color: #9b3434;
-    background: #fbe9e5;
+    color: var(--pwa-accent);
+    background: var(--pwa-accent-soft);
 }
 .pwa-status .pwa-update {
-    background: #9b3434;
+    background: var(--pwa-accent);
     color: #fff9e9;
     cursor: pointer;
 }
@@ -61,7 +61,7 @@
     display: none;
 }
 .pwa-status :focus-visible {
-    outline: 3px solid #9b3434;
+    outline: 3px solid var(--pwa-accent);
     outline-offset: 3px;
 }
 @media (max-width: 480px) {
@@ -73,4 +73,16 @@
     }
 }
 
-.pwa-todo-link { color: #8d3734; text-decoration: none; }
+.pwa-todo-link {
+    color: var(--pwa-accent);
+    text-decoration: none;
+}
+
+.pwa-cache-reset {
+    color: var(--pwa-accent);
+    cursor: pointer;
+}
+.pwa-cache-reset:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

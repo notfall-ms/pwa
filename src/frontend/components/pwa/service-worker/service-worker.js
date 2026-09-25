@@ -45,7 +45,9 @@ const cleanCaches = async () => {
         keys
             .filter(
                 (key) =>
-                    key.startsWith(PWA.cachePrefix) && key !== PWA.cacheName
+                    key.startsWith(PWA.cachePrefix) &&
+                    key !== PWA.cacheName &&
+                    key !== PWA.pagerCacheName
             )
             .map((key) => caches.delete(key))
     );
@@ -71,6 +73,9 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
     if (request.method !== 'GET') return;
+    // Pager validates and caches its own network-first JSON responses.
+    if (url.origin === self.location.origin && url.pathname === PWA.pagerPath)
+        return;
     if (PWA.development && isDevelopmentAsset(request, url)) {
         event.respondWith(developmentResponse(request));
         return;

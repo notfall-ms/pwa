@@ -26,6 +26,8 @@ export const renderTasks = (container: HTMLElement): void => {
 /** 🎯 Refresh task counts, score and non-cumulative achievement badges. */
 export const renderProgress = (): void => {
     const { completed, total, remaining, percent } = getProgress();
+    document.documentElement.dataset.preparedness =
+        remaining === 0 ? 'complete' : 'incomplete';
     document.querySelectorAll('[data-todo-count]').forEach((element) => {
         element.textContent = remaining
             ? `☐ ${remaining} offen`

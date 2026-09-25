@@ -2,7 +2,7 @@
 
 {# Base HTML, compatible with what Vite expects #}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,7 +11,7 @@
     <title>{{title or metadata.title}}</title>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/assets/logo.jpg">
+    <link rel="apple-touch-icon" href="/assets/pwa-192.png">
     <link href="/assets/bootstrap.min.css" rel="stylesheet" type="text/css">
 
     {% if build.env == "production" %}
@@ -24,6 +24,7 @@
 
 {% set mainClass = "container xx" if not full_content else "" %}
 <body>
+    {% include "../components/pwa/status/status.njk" %}
     {% if navigation == true %}
         {% set menuItems = collections.menuPages | default([]) %}
         <div class="offcanvas offcanvas-end" tabindex="-1" id="mainNav" aria-labelledby="mainNavLabel">

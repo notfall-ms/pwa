@@ -1,0 +1,74 @@
+.pwa-status {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem clamp(1rem, 4vw, 3rem);
+    background: linear-gradient(120deg, #fffdf6f5, #fff4d9f5);
+    border-bottom: 1px solid #edddb9;
+    backdrop-filter: blur(16px);
+    color: #503b33;
+    box-shadow: 0 6px 24px #78512912;
+}
+.pwa-brand {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    color: #6e3030;
+    font-size: 1.15rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+.pwa-brand:hover {
+    color: #a93636;
+}
+.pwa-brand-suffix {
+    color: #b13737;
+}
+.pwa-indicators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+.pwa-chip,
+.pwa-update {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid #e8d9bc;
+    border-radius: 2rem;
+    background: #ffffffb3;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.pwa-status [data-pwa-network] {
+    color: #75602a;
+}
+.pwa-status [data-offline='true'] {
+    color: #9b3434;
+    background: #fbe9e5;
+}
+.pwa-status .pwa-update {
+    background: #9b3434;
+    color: #fff9e9;
+    cursor: pointer;
+}
+.pwa-status [hidden] {
+    display: none;
+}
+.pwa-status :focus-visible {
+    outline: 3px solid #9b3434;
+    outline-offset: 3px;
+}
+@media (max-width: 480px) {
+    .pwa-status {
+        justify-content: center;
+    }
+    .pwa-chip {
+        padding: 0.35rem 0.6rem;
+    }
+}

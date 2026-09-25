@@ -1,0 +1,79 @@
+.pwa-markdown {
+    flex-basis: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 1.25rem;
+    border: 1px solid #eee3d3;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #685d54;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+}
+.pwa-documents .pwa-markdown :is(h1, h2, h3, h4, h5, h6) {
+    color: #643b35;
+    margin: 1.25rem 0 0.6rem;
+    font-weight: 700;
+    letter-spacing: normal;
+}
+.pwa-documents .pwa-markdown h1 {
+    font-size: 1.5rem;
+}
+.pwa-documents .pwa-markdown h2 {
+    font-size: 1.25rem;
+}
+.pwa-documents .pwa-markdown :is(h3, h4, h5, h6) {
+    font-size: 1.05rem;
+}
+.pwa-markdown > :first-child {
+    margin-top: 0 !important;
+}
+.pwa-markdown > :last-child {
+    margin-bottom: 0;
+}
+.pwa-markdown a {
+    color: #9b3434;
+    text-underline-offset: 0.2em;
+}
+.pwa-markdown blockquote {
+    border-left: 3px solid #d9b551;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    background: #fffbef;
+}
+.pwa-markdown code {
+    color: #813c34;
+    background: #fff6df;
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.25rem;
+}
+.pwa-documents .pwa-markdown pre {
+    overflow-x: auto;
+    white-space: pre;
+    margin: 1rem 0;
+    background: #fffaf0;
+    font:
+        0.85rem/1.6 ui-monospace,
+        monospace;
+}
+.pwa-markdown pre code {
+    background: none;
+    padding: 0;
+}
+.pwa-markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+.pwa-markdown :is(th, td) {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #eee3d3;
+}
+.pwa-markdown th {
+    background: #fff6df;
+}
+.pwa-markdown img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+}

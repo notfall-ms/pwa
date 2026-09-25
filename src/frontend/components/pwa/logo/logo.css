@@ -1,0 +1,15 @@
+.pwa-logo {
+    width: fit-content;
+    margin: 2rem auto 1.5rem;
+    padding: 1.5rem 2rem;
+    border: 1px solid #eee8dc;
+    border-radius: 1.5rem;
+    background: #fff;
+    box-shadow: 0 10px 28px #6747310a;
+}
+.pwa-logo img {
+    display: block;
+    width: 240px;
+    max-width: 100%;
+    height: auto;
+}

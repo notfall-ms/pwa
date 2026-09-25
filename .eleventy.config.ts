@@ -1,3 +1,5 @@
+import { buildPwa } from './src/setup/pwa/pwa';
+import { pwaConfig } from './pwa.config';
 import { LOG } from '@robert.tools/log';
 
 // 3rd-party imports
@@ -29,6 +31,7 @@ type EleventyConfig = any;
 // export default arrow function (ESM)
 const eleventyConfigFn = (eleventyConfig: EleventyConfig) => {
     eleventyConfig.on('eleventy.after', async () => {
+        if (process.env.NODE_ENV !== 'production') buildPwa(true);
         // Run me after the build ends
         LOG.OK('✅  Eleventy build finished!');
     });
@@ -36,6 +39,8 @@ const eleventyConfigFn = (eleventyConfig: EleventyConfig) => {
         LOG.FAIL('❌  Eleventy error:', error.message);
     });
     eleventyConfig.addWatchTarget('./src/frontend/');
+    eleventyConfig.addWatchTarget(pwaConfig.documentsSource);
+    eleventyConfig.addWatchTarget('./pwa.config.ts');
 
     // static asset paths
     config.STATIC_ASSETS.forEach((asset: Record<string, string>) => {

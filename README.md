@@ -16,3 +16,4 @@
 
 # Documentation
 * [docs](docs/index.md) - project documentation
+* [PWA and offline documents](docs/pwa.md) - setup, caching and installation

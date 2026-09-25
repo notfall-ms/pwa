@@ -39,13 +39,11 @@ const configId = 'eleventynunjuckstemplate';
 
 // source → dist pairs (authoring format)
 const staticAssetsAuthoring: Array<{ src: string; dist: string }> = [
-    { src: './src/stations', dist: 'stations' },
     { src: './src/frontend/assets/', dist: 'assets' },
     {
         src: './src/frontend/manifest.webmanifest',
         dist: 'manifest.webmanifest',
     },
-    { src: './src/frontend/sw.js', dist: 'sw.js' },
 ];
 
 // Eleventy passthrough expects: [{ 'src': 'dist' }, ...]

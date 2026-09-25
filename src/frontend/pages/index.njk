@@ -1,6 +1,6 @@
 ---
 layout: base.template.njk
-title: Welcome to XXX-XXX
+title: notfall.ms – Notfalldokumente
 navigation: true
 footer: true
 menu:
@@ -9,34 +9,8 @@ menu:
   order: 10
 ---
 
-{%- from "./../templates/_setup/macros/component.macro.njk" import component -%}
- <div class="container-fluid my-5 text-center">
-     {{
-           component("image", {
-             image: main.logo.src,
-             class: "foobar",
-             alt_prefix: main.logo.alt,
-             width: "30%",
-             height: "auto",
-             inline: true
-           })
-         }}
- </div>
- {% set sample = [{ type: 'ok', name: 'foo'}]%}
-{# test field #} 
-
-
-<div class="container my-5 text-center">
-    {% for link in main.links %}
-    {% set disabled = (link.disabled is defined and link.disabled == true) or (link.url is not defined) %}
-        {{
-            component("button_link", {
-                "type": link.type or "link",
-                "text": link.text,
-                "url": link.url,
-                "disabled": disabled
-            })
-        }}
-    {% endfor %}
+<div class="pwa-logo">
+    <img src="/assets/logo.svg" alt="notfall.ms" width="240">
 </div>
-
+{% include "../components/pwa/install/install.njk" %}
+{% include "../components/pwa/documents/documents.njk" %}

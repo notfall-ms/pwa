@@ -14,7 +14,7 @@
     "app": "tsx src/setup/scripts/app.ts",
     "health": "npm run task health",
     "dev": "npm run task dev",
-    "build": "NODE_ENV=production npm run task build",
+    "build": "NODE_ENV=production tsx src/setup/scripts/build.ts",
     "start:healthcheck_wait": "until curl -sf -o /dev/null http://localhost:3000/@vite/client; do sleep 0.2; done; npm run build:healthcheck_fast; wait",
     "build:healthcheck": "npm run build_appX -- healthcheck",
     "build:healthcheck_fast": "npm run build_appX -- healthcheck --fast",
@@ -48,6 +48,7 @@
     "@robert.tools/log": "^1.0.0",
     "@robert.tools/setup": "^1.3.0",
     "@types/jest": "^29.5.3",
+    "@types/markdown-it": "^14.2.0",
     "@types/mock-fs": "^4.13.4",
     "@types/node": "^25.9.1",
     "@typescript-eslint/eslint-plugin": "^8.59.4",
@@ -83,6 +84,7 @@
     "@robert.tools/eleventy-filter-translate": "^1.0.0",
     "@robert.tools/eleventy-shortcodes-script-style": "^1.0.0",
     "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "markdown-it": "12.3.2"
   }
 }

@@ -1,0 +1,21 @@
+{% set tag = params.tag or "span" %}
+{% set css_modifier = params.css or "" %}
+{% set css = "text--standard " ~ css_modifier %}
+
+{% set text = (params.prefix or "") ~ params.text ~ (params.suffix or "") %}
+
+{% if params.text is defined %}
+    {% if tag == 'span'  %}
+        <span class="{{css}}" data-search-mark data-component="text.atom">{{ text }}</span>
+    {% elif tag == 'h1' %}
+        <h1 class="{{css}}" data-search-mark data-component="text.atom">{{ text }}</h1>
+    {% elif tag == 'h2' %}
+        <h2 class="{{css}}" data-search-mark data-component="text.atom">{{ text }}</h2>
+    {% elif tag == 'h3' %}
+        <h3 class="{{css}}" data-search-mark data-component="text.atom">{{ text }}</h3>
+    {% elif tag == 'p' %}
+        <p class="{{css}}" data-search-mark data-component="text.atom">{{ text }}</p>
+    {% else %}
+        {{ text }}
+    {% endif %}
+{% endif %}

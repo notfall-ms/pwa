@@ -1,0 +1,89 @@
+{%- from "./_setup/macros/component.macro.njk" import component -%}
+
+{# Base HTML, compatible with what Vite expects #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d6efd">
+    <title>{{title or metadata.title}}</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/assets/logo.jpg">
+    <link href="/assets/bootstrap.min.css" rel="stylesheet" type="text/css">
+
+    {% if build.env == "production" %}
+        {# Add any CSS from the main script #}
+        {% viteLinkStylesheetTags config.ENTRY_FILE, config.PATH_PREFIX %}
+    {% endif %}
+
+</head>
+
+
+{% set mainClass = "container xx" if not full_content else "" %}
+<body>
+    {% if navigation == true %}
+        {% set menuItems = collections.menuPages | default([]) %}
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="mainNav" aria-labelledby="mainNavLabel">
+            <div class="offcanvas-header border-bottom">
+                <div>
+                    <p class="text-muted text-uppercase small mb-1">Navigation</p>
+                    <h2 class="offcanvas-title h5 mb-0" id="mainNavLabel">{{ menu.label or title }}</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+            </div>
+            <div class="offcanvas-body">
+                <p class="text-muted small mb-3">{{ page.url }}</p>
+                <ul class="navbar-nav gap-2">
+                    {% for item in menuItems %}
+                        <li class="nav-item">
+                            <a
+                                class="nav-link{% if page.url == item.url %} active fw-semibold{% endif %}"
+                                href="{{ item.url }}"
+                                {% if page.url == item.url %}aria-current="page"{% endif %}>
+                                {% if item.emoji %}<span class="me-2">{{ item.emoji }}</span>{% endif %}
+                                {{ item.title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="{{mainClass}}">
+
+        {% if content %}
+            {{ content | safe }}
+        {% else %}
+
+        {% endif %}
+    </div>
+
+    {# footer #}
+    {% if footer == true %}
+        {{
+            component("footer", {
+                main: main,
+                config: build
+            })
+        }}
+    {% endif %}
+
+    <script src="/assets/bootstrap.bundle.min.js"></script>
+
+    {#  scripts #}
+    {% if build.env == "production" %}
+        {# We must read the production scripts from the Vite manifest. We defer that logic to a custom shortcode #}
+        {% viteScriptTag config.ENTRY_FILE, config.PATH_PREFIX %}
+        {% viteLegacyScriptTag config.ENTRY_FILE, config.PATH_PREFIX %}
+    {% else %}
+        {# The vite development client #}
+        <script type="module" src="{{config.HOST_VITE}}/@vite/client"></script>
+        {# The main script entry for development (pointing to vite) #}
+        <script type="module" src="{{config.HOST_VITE}}/{{config.ENTRY_FILE}}"></script>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,42 @@
+{#
+    @component key_value
+    @description display a key and its associated value.
+    @optional support for displaying a flag icon based on a country code
+
+    @param {string} key - the key or label for the value
+    @param {string} value - the value associated with the key
+    @param {string} start - the start value (for ranges)
+    @param {string} end - the end value (for ranges)
+    @param {string} flag - the country code for the flag (optional)
+
+#}
+
+{% set css = params.css or "" %}
+{% if params.value or params.start or params.end %}
+    <div class="{{css}}">
+
+            <dt>{{params.key}}</dt>
+            <dd  data-search-mark>
+            {% if params.flag is defined %}
+                {{
+                    component("flag", {
+                        country: params.flag,
+                        width: 20
+                    })
+                }}
+            {% endif %}
+            {% if params.value is defined %}
+                {{ params.value }}
+            {% endif %}
+            {% if params.start is defined %}
+                {{ params.start }}
+            {% endif %}
+             {% if params.start and params.end and params.end != "" %}
+-
+             {% endif %}
+            {% if params.end is defined %}
+                {{ params.end }}
+                {% endif %}
+            </dd>
+    </div>
+{% endif %}

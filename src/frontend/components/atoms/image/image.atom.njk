@@ -1,0 +1,52 @@
+{# DESCRIPTION
+    @component image
+    @description display an image
+
+    @param {string} image - the URL of the image to be displayed
+    @param {string} alt_prefix - a prefix for the alt text, combined with the
+        name of the item (e.g. "Logo of " + item.name)
+    @param {string} width - the width of the image (e.g. "100px" or "100%")
+    @param {string} height - the height of the image
+    @param {boolean} lazy - whether to enable lazy loading for the image
+    @param {string} class - additional CSS classes for styling the image
+
+
+    @param {string} text - the text to be displayed inside the badge
+    @param {string} css - additional CSS classes for styling the badge
+    @param {string} prefix - optional text to be displayed before the main text
+
+#}
+
+{# VARIABLES #}
+{% set item = params.item %}
+{% set item = name or "" %}
+{% set item = alt or "" %}
+
+
+{% set alt_text = 'alt="' + params.alt_prefix + name + alt + '"' %}
+{% set lazy_loading = 'loading="lazy" ' | safe if params.lazy else '' %}
+{% set width = 'width="' + params.width + '"' %}
+{% set height = 'height="' + params.height + '"' %}
+{% set image_url = params.image or item.image %}
+{% set class = params.class or params.css or "" %}
+
+{# TEMPLATE #}
+{% if image_url is defined %}
+
+  {# integrate svg as inline #}
+  {% if image_url | contains('.svg') and params.inline is defined and params.inline == true %}
+      {{ image_url | svg([params.width, params.height], class) | safe }}
+  {% else %}
+    <img data-component="image.atom"
+        data-neutral-image="true"
+        class="{{class}} x"
+        src="{{image_url}}"
+        {{alt_text | safe}} {{width | safe}} {{height | safe}} {{lazy_loading | safe}}>
+  {% endif %}
+{% endif %}
+{% if params.placeholder is defined %}
+    <span
+        data-neutral-placeholder="true"
+        class="neutral-image-placeholder {{class}}{% if image_url is defined %} x{% endif %}"
+        aria-hidden="true">{{ params.placeholder | first | upper }}</span>
+{% endif %}

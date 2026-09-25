@@ -1,0 +1,83 @@
+{% set item  = params.item %}
+{% set category  = params.category %}
+{% set statusClass = statusClasses[item.status] | default('text-bg-secondary') %}
+
+<article
+    class="portfolio-item{% if item.pinned %} is-pinned{% endif %}"
+    data-search-item 
+    data-category="{{ item.category }}"
+    data-search="{{ item | getSearchValue(category) }}"
+    data-title="{{ item.title | lower }}"
+    data-status="{{ item.status | lower }}"
+    data-start="{{ item.start }}"
+    data-pinned="{% if item.pinned %}1{% else %}0{% endif %}">
+    <div class="portfolio-visual">
+        {% if item.screenshot %}
+        <a href="{{ item.url or item.screenshot }}" {% if url %}target="_blank" rel="noopener noreferrer"{% endif %} aria-label="{{ item.title }} öffnen">
+            {{
+                component("image", {
+                    image: item.screenshot,
+                    css: "portfolio-screenshot",
+                    height: "auto",
+                    width: "30",
+                    alt: "Screenshot von {{ item.title }}",
+                    placeholder: item.title,
+                    lazy: true
+                })
+            }}
+        </a>
+        {% else %}
+            <div class="portfolio-iconbox" aria-hidden="true">
+                {{
+                    component("image", {
+                        image: item.icon,
+                        height: "auto",
+                        width: "30",
+                        placeholder: item.title,
+                        lazy: true
+                    })
+                }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="portfolio-content">
+        <div class="portfolio-item-top">
+            <div class="min-w-0">
+                <p class="portfolio-path mb-1"  data-search-mark>{{ category }}/{{ item.name | lower | replace(' ', '-') }}</p>
+                <h3 class="portfolio-item-title mb-0"  data-search-mark>{{ item.title }}</h3>
+            </div>
+            {% if item.pinned == "TRUE" %}
+                <span class="portfolio-pin" title="Hervorgehoben">📌</span>
+            {% endif %}
+        </div>
+
+        <div class="portfolio-badges">
+                {{ component("badge", { text: item.status, css: statusClass }) }}
+                {{ component("badge", { text: item.prize, css: "text-bg-success", prefix: "🏆" }) }}
+                {{ component("badge", { text: item.tags, css: "portfolio-muted-badge" }) }}
+        </div>
+
+        {% if item.description %}
+            <p class="portfolio-description">{{ item.description }}</p>
+        {% endif %}
+
+        <dl class="portfolio-meta">
+            {% for metaItem in params.meta %}
+                {% if metaItem.value %}
+                     {{ component("key_value", { key: metaItem.key, value: metaItem.value, flag: metaItem.country }) }}
+                {% elif metaItem.start or metaItem.end %}
+                     {{ component("key_value", { key: metaItem.key, start: metaItem.start, end: metaItem.end }) }}
+                {% endif %}
+            {% endfor %}
+        </dl>
+
+        <div class="portfolio-links">
+            {% for link in params.links %}
+                {% if link.url %}
+                    {{ component("link", { url: link.url, text: link.text, css: link.css, target: "_blank" }) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</article>

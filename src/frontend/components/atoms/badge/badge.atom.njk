@@ -1,0 +1,23 @@
+{# DOCS
+    @component badge
+    @description display a badge.
+
+    @param {string} text - the text to be displayed inside the badge
+    @param {string} css - additional CSS classes for styling the badge
+    @param {string} prefix - optional text to be displayed before the main text
+
+#}
+
+{# VARIABLES #}
+{% set text = params.text %}
+{% set css = params.css or "" %}
+{% set prefix = params.prefix %}
+
+
+{# TEMPLATE #}
+{% if text %}
+    <span  data-search-mark class="badge {{css}}" data-component="image.atom">
+        {% if prefix is defined %}{{prefix}} {% endif %}
+        {{ text }}
+    </span>
+{% endif %}

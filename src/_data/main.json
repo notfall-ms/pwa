@@ -1,0 +1,20 @@
+{
+    "greeting": "Hello, World",
+    "logo": {
+        "src": "/assets/logo.svg",
+        "alt": "Logo Image"
+    },
+    "footer": {
+        "text": "Made with ❤️ by the team of notfall.ms"
+    },
+    "links": [
+        {
+            "text": "Installieren",
+            "url": "https://github.com/willi84/",
+            "target": "_blank",
+            "image_before": "github.svg",
+            "size": [20,20],
+            "type": "button"
+        }
+    ]
+}

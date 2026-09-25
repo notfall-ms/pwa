@@ -1,0 +1,9 @@
+{% set item = params.item %}
+{% set css = "fw-semibold text-decoration-none" %}
+{% set text = item.text or item.title %}
+
+{% if item.url %}
+    {{ component("link", { url: item.url, text: text, css: css, target: "_blank", tag: params.tag }) }}
+{% else %}
+    {{ component("text", { text: text, css: css})}}
+{% endif %}

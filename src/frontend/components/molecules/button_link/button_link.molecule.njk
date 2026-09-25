@@ -1,0 +1,52 @@
+{% set dimension = [params.width, params.height] if params.width and params.height else params.size %}
+{% set class_svg = params.class_svg | safeParam() %}
+{% set class_modifier = params.class_modifier | safeParam() %}
+{% set pre_html = (params.image_before | replace("./assets/", "") | svg(dimension, class_svg, attributes) | safe) if params.image_before is defined else "" %}
+{% set post_html = (params.image_after | replace("./assets/", "") | svg(dimension, class_svg, attributes) | safe) if params.image_after is defined else "" %}
+
+{% set type = params.type | safeParam(params.type_button) %}
+{% set text = params.text | safeParam() %}
+{% set class_css = params.class | safeParam() %}
+{% set type_content = params.type_content | safeParam() %}
+{# set button type #}
+{# {% set class_modifier = "" %} #}
+{# {% if type == "link" %}
+    {% set class_modifier = "btn--ghost" %}
+{% endif %}
+{% if type == "cta" %}
+    {% set class_modifier = "btn--cta" %}
+{% endif %} #}
+{% set component_name = "button" | safeParamIf(type == "button", "link") %}
+
+{% if params.type_content and component_name == "button" %}
+    {% set class_modifier = class_modifier + " btn btn-" + type_content %}
+{% endif %}
+
+{# set optional attributes #}
+{% set attributes = {} %}
+
+{% if params.focusable is defined %}
+  {% set attributes = attributes | merge({"focusable": params.focusable}) %}
+{% endif %}
+
+{% if params.aria_hidden is defined %}
+  {% set attributes = attributes | merge({"ariaHidden": params.aria_hidden}) %}
+{% endif %}
+
+{{
+    component(component_name, {
+        class: class_css,
+        class_modifier: class_modifier,
+        url: params.url,
+        target: params.target,
+        disabled: params.disabled,
+        text: text,
+        collapseID: params.collapseID,
+        collapseShow: params.collapseShow,
+        type_content: type_content,
+        pre_html: pre_html,
+        post_html: post_html,
+        attributes: attributes
+    })
+}}
+

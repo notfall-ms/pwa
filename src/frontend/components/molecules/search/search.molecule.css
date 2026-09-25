@@ -1,0 +1,9 @@
+mark{
+    padding: 0;
+}
+.search--hidden{
+    opacity: 0;
+}
+.search--highlight{
+    color: var(--pf-accent);
+}

@@ -1,0 +1,42 @@
+---
+layout: base.template.njk
+title: Welcome to XXX-XXX
+navigation: true
+footer: true
+menu:
+  label: Start
+  emoji: 🏠
+  order: 10
+---
+
+{%- from "./../templates/_setup/macros/component.macro.njk" import component -%}
+ <div class="container-fluid my-5 text-center">
+     {{
+           component("image", {
+             image: main.logo.src,
+             class: "foobar",
+             alt_prefix: main.logo.alt,
+             width: "30%",
+             height: "auto",
+             inline: true
+           })
+         }}
+ </div>
+ {% set sample = [{ type: 'ok', name: 'foo'}]%}
+{# test field #} 
+
+
+<div class="container my-5 text-center">
+    {% for link in main.links %}
+    {% set disabled = (link.disabled is defined and link.disabled == true) or (link.url is not defined) %}
+        {{
+            component("button_link", {
+                "type": link.type or "link",
+                "text": link.text,
+                "url": link.url,
+                "disabled": disabled
+            })
+        }}
+    {% endfor %}
+</div>
+

@@ -1,0 +1,8 @@
+@import './variables/variables.css';
+@import './../components/atoms/button/button.atom.css';
+@import './../components/molecules/search/search.molecule.css';
+
+
+button {
+  background: rgb(255, 0, 0);
+}

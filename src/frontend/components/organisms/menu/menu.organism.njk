@@ -1,0 +1,78 @@
+
+{% set page = params.page %}
+{% set main = params.main %}
+{% set url = params.url or page.url | lower %}
+{% set currentPath = "~/" if url == "/" else "~" ~ url %}
+
+<header class="portfolio-header mb-4 z-3 position-relative">
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <a class="portfolio-logo" href="/" aria-label="Startseite">
+                        {{
+                            component("image", {
+                                image: main.logo.src,
+                                class: "",
+                                alt_prefix: main.logo.alt,
+                                width: "50%",
+                                height: "auto",
+                                lazy: true
+                            })
+                        }}
+                    </a>
+                    <div>
+                        <p class="portfolio-kicker mb-1">{{ currentPath }}</p>
+                        {%if params.title %}<h1 class="portfolio-title mb-1">{{params.title}}</h1>{% endif %}
+                        {%if params.subtitle %}
+                            <p class="portfolio-subtitle mb-0">
+                                {{params.subtitle}}
+                                {{ component("badge", { text: params.state, css: 'bg-warning' }) }}
+                            </p>
+                            {% endif %}
+                    </div>
+                </div>
+
+                <div class="portfolio-header-controls d-flex flex-column align-items-start align-items-md-end gap-2">
+                    {% if params.neutral_toggle %}
+                        <fieldset class="portfolio-neutral-toggle" aria-label="Ansichtsauswahl">
+                            <legend class="portfolio-neutral-label">Ansicht</legend>
+                            <label class="portfolio-neutral-option">
+                                <input type="radio" name="neutral-mode" value="default">
+                                <span>Standard</span>
+                            </label>
+                            <label class="portfolio-neutral-option">
+                                <input type="radio" name="neutral-mode" value="neutral">
+                                <span>Neutral</span>
+                            </label>
+                        </fieldset>
+                    {% endif %}
+
+                    <div class="portfolio-actions d-flex flex-wrap gap-2 align-items-center justify-content-md-end">
+                        {% if params.views is defined%}
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Ansicht wechseln">
+                                {% for view in params.views %}
+                                    {% set active = "active" if loop.index == 0 else "" %}
+                                    <button class="btn btn-outline-light {{active}}" type="button" data-view-button="{{view.key}}">{{view.label}}</button>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {{
+                            component("dropdown", {
+                                values: [ 'light','green', 'red', 'dark', 'blue', 'yellow'],
+                                defaultValue: "dark",
+                                key: "bs-theme",
+                                label: "Theme"
+                            })
+                        }}
+                        <button
+                            class="btn btn-sm btn-outline-light"
+                            type="button"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#mainNav"
+                            aria-controls="mainNav"
+                            aria-label="Menü öffnen">
+                            ☰ Menü
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>

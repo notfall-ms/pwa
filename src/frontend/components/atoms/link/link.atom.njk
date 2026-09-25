@@ -1,0 +1,35 @@
+{% set css = params.css or params.class %}
+{% set tag = params.tag or "span" %}
+{% set text_css = (css or "") ~ " " ~ (params.class_modifier or "") %}
+
+{# {% set aria_label = 'aria_label="' ~ params.aria_label ~ '"' if params.aria_label is defined else "" %} #}
+
+
+{# {%- from "./../../../templates/_setup/macros/component.macro.njk" import component -%} #}
+
+
+{% if params.url %}
+    <a 
+        rel="noopener noreferrer"
+        data-component-type="atom" 
+        data-component="link" 
+        {{aria_label | safe }}
+    
+    {% if params.target is defined %}
+        target="{{params.target}}"
+    {% endif %} 
+    class="{{ css }} {{params.class_modifier}}" href="{{ params.url | url | safe}}"
+    >
+   {{ component("text", { text: params.text, tag: tag, css: text_css }) }}
+
+    {% if params.post_html %}
+        {{params.post_html | safe}}
+    {% endif %}
+</a>
+{% else %}
+    {{ component("text", { text: params.text, tag: tag, css: text_css }) }}
+
+    {% if params.post_html %}
+        {{params.post_html | safe}}
+    {% endif %}
+{% endif %}

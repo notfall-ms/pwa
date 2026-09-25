@@ -1,0 +1,16 @@
+<div class="dropdown">
+    <button 
+    data-default-value="{{ params.defaultValue }}" 
+    data-key="{{ params.key }}" 
+    {% if params.sort %}
+        data-sort="{{ params.sort }}"
+    {% endif %} 
+    class="btn btn-sm {{ params.css or 'btn-outline-light' }} dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        {{params.label}}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        {% for value in params.values %}
+            <li><button class="dropdown-item" type="button" data-option="{{value}}">{{ value }}</button></li>
+        {% endfor %}
+    </ul>
+</div>

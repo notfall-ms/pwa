@@ -1,0 +1,12 @@
+{%- macro component(name, params) -%}
+
+  {% set types = [ "", "atom", "molecule", "organism" ] %}
+
+  {% for type in types %}
+    {% set folder =  type + "s" + "/"  if type != "" else "" %}
+    {% set middle = "." + type  if type != ""  else "" %}
+    {% include "./../../../components/" + folder  + name + "/" + name +  ".njk" ignore missing %}
+    {% include "./../../../components/" + folder  + name + "/" + name + middle + ".njk" ignore missing %}
+  {% endfor %}
+
+{%- endmacro -%}

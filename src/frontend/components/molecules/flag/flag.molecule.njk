@@ -1,0 +1,16 @@
+{#
+🧬 Flag molecule
+
+🧩 Parameters:
+- country (string): The country code (e.g., "US", "FR", "DE").
+- width (number, optional): The width of the flag image (default: 40).
+- height (number, optional): The height of the flag image (default: 24).
+#}
+
+{% set width = params.width or "40" %}
+{% if params.country %}
+    <img
+        src="{{ params.country | flag(width) }}"
+        alt="{{ params.country }}"
+        loading="lazy">
+{% endif %}

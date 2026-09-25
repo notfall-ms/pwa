@@ -1,0 +1,23 @@
+{#
+    @param {string} class - additional classes for the input element
+    @param {string} placeholder - placeholder text for the search input
+    @param {string} label - label of an input
+#}
+
+{% if params.label is defined %}
+    <label class="visually-hidden" for="main-search">{{params.label}}</label>
+{% endif %}
+<div class="search-wrapper">
+    <input
+        id="main-search"
+        class="form-control {{params.class}}"
+        type="search"
+        placeholder="{{params.placeholder}}"
+        autocomplete="off"
+        data-search-input>
+    <span data-search-result class="px-2">
+        <small class="text-muted">
+            <span data-search-count class="search--highlight">0</span> items found in (<span data-search-time class="search--highlight">0</span> ms)
+        </small>
+    </span>
+</div>

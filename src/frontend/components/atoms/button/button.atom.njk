@@ -1,0 +1,71 @@
+{%
+    set collapseID =  params.collapseID
+%}
+{%
+    set collapseShow =  params.collapseShow if params.collapseShow is defined else ""
+%}
+{%
+    set class_css = params.class | safeParam()
+%}
+{% if params.class_modifier %}
+    {%
+        set class_css = class_css + params.class_modifier | safeParam()
+    %}
+{% endif %}
+<button data-component="button.atom" 
+    class="{{class_css}}"
+
+    {#  focused #}
+    {% if params.focusable is defined %}
+        focusable="{{params.focusable}}"
+    {% endif %}
+
+    {#  aria-label #}
+    {% if params.aria_label is defined %}
+        aria-label="{{params.aria_label}}"
+    {% endif %}
+
+    {#  aria-hidden #}
+    {% if params.aria_hidden is defined %}
+        aria-hidden="{{params.aria_hidden}}"
+    {% endif %}
+
+    {#  target #}
+    {% if params.target is defined %}
+        target="{{params.target}}"
+    {% endif %}
+
+    {#  onclick url #}
+    {% if params.url is defined %}
+        onclick="window.location.href='{{params.url | safe}}'"
+    {% endif %}
+
+    {#  collapse #}
+    {% if collapseID %}
+        data-bs-toggle="collapse"
+        data-bs-target="#{{collapseID}}"
+        aria-expanded="{{ 'true' if collapseShow == 'show' else 'false' }}"
+        aria-controls="{{collapseID}}"
+    {% endif %}
+
+    {#  type #}
+    {% if params.type is defined %}
+        type="{{params.type}}"
+    {% else %}
+        type="button"
+    {% endif %}
+
+    {#  disabled #}
+    {% if params.disabled == true%}
+        disabled
+    {% endif %}
+
+>
+{% if params.pre_html %}
+    {{params.pre_html | safe}}
+{% endif %} 
+{{params.text}}
+    {% if params.post_html %}
+        {{params.post_html | safe}}
+    {% endif %}
+</button>

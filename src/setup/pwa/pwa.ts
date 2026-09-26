@@ -1,5 +1,11 @@
 import { createHash } from 'node:crypto';
-import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+    copyFileSync,
+    cpSync,
+    mkdirSync,
+    readFileSync,
+    writeFileSync,
+} from 'node:fs';
 import { join, relative } from 'node:path';
 import { pwaConfig } from '../../../pwa.config';
 import { config } from '../../../project.config';
@@ -12,8 +18,11 @@ export const buildPwa = (development = false): void => {
     if (!/^\/(?:[a-zA-Z0-9_-]+\/)+$/.test(documentsPath)) {
         throw new Error('documentsPath must be an absolute directory URL.');
     }
+    mkdirSync(config.OUTPUT_DIR, { recursive: true });
+    // Copy directly: cpSync unlinks existing targets before copying, which races
+    // with another build removing files from the shared output directory.
     if (development)
-        cpSync(
+        copyFileSync(
             'src/frontend/components/pwa/service-worker/development/development.js',
             join(config.OUTPUT_DIR, 'sw-development.js')
         );

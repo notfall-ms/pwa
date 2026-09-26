@@ -19,15 +19,25 @@ const developmentResponse = async (request) => {
     const cache = await caches.open(PWA.cacheName);
     const url = new URL(request.url);
     url.searchParams.delete('t');
-    const key = url.href;
+    const document =
+        url.origin === self.location.origin &&
+        url.pathname.startsWith(PWA.documentsPath);
+    const key = document ? url.origin + url.pathname : url.href;
     try {
         const response = await fetch(request);
-        if (response.ok && response.type !== 'opaque') {
-            await cache.put(key, response.clone());
+        if (!response.ok) throw new Error('Network response unavailable');
+        if (response.status === 200 && response.type !== 'opaque') {
+            try {
+                await cache.put(key, response.clone());
+            } catch {
+                /* Keep live documents readable. */
+            }
         }
         return response;
     } catch {
-        const cached = await cache.match(key);
+        const cached =
+            (await cache.match(key)) ||
+            (document && (await cache.match(url.pathname)));
         if (cached) return cached;
         return new Response('Offline nicht verfügbar', { status: 503 });
     }

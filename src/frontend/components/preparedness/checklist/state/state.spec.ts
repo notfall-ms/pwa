@@ -12,14 +12,14 @@ beforeEach(() => {
 });
 
 test('persists completion without awarding additional credit for repeated toggles', () => {
-    setComplete(tasks[0].id, true);
-    setComplete(tasks[0].id, true);
+    setComplete('contacts', true);
+    setComplete('contacts', true);
     expect(getProgress().completed).toBe(1);
-    setComplete(tasks[0].id, false);
+    setComplete('contacts', false);
     expect(getProgress().completed).toBe(0);
-    setComplete(tasks[0].id, true);
+    setComplete('contacts', true);
     restoreChecklist();
-    expect(isComplete(tasks[0].id)).toBe(true);
+    expect(isComplete('contacts')).toBe(true);
     expect(getProgress().remaining).toBe(tasks.length - 1);
 });
 
@@ -29,7 +29,7 @@ test('handles corrupt storage and excludes unknown task IDs', () => {
     expect(getProgress().completed).toBe(0);
     localStorage.setItem(
         'notfall-ms-checklist-v1',
-        JSON.stringify([tasks[0].id, 'unknown', tasks[0].id])
+        JSON.stringify(['contacts', 'unknown', 'contacts'])
     );
     restoreChecklist();
     expect(getProgress().completed).toBe(1);
@@ -44,4 +44,13 @@ test('reaches exactly 100 percent and no open tasks', () => {
         remaining: 0,
         percent: 100,
     });
+});
+
+test('restores the tracking task from consent rather than a stale checkbox', () => {
+    localStorage.setItem('notfall-ms-checklist-v1', '["tracking"]');
+    restoreChecklist();
+    expect(isComplete('tracking')).toBe(false);
+    localStorage.setItem('notfall-ms-tracking-consent-v1', 'true');
+    restoreChecklist();
+    expect(isComplete('tracking')).toBe(true);
 });

@@ -32,8 +32,18 @@ export const showDocuments = async (status: PwaStatus): Promise<void> => {
     const cache = await caches.open(status.cacheName);
     const documents = await Promise.all(
         status.documents.map(async (url) => {
-            const response = await cache.match(url);
-            return response ? renderDocument(url, response) : null;
+            try {
+                let response = await cache.match(url);
+                if (!response) {
+                    const fresh = await fetch(url);
+                    if (!fresh.ok || fresh.status !== 200) return null;
+                    await cache.put(url, fresh.clone());
+                    response = fresh;
+                }
+                return await renderDocument(url, response);
+            } catch {
+                return null;
+            }
         })
     );
     container?.replaceChildren(

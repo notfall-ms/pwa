@@ -37,8 +37,8 @@ test('records installation and aggregate progress under a stable random hash', a
     expect(events[1]).toMatchObject({
         district: 'Münster-West',
         installed: true,
-        completed: 1,
-        total: 6,
+        completed: 2,
+        total: 7,
     });
     expect(Object.keys(events[1]).sort()).toEqual([
         'completed',

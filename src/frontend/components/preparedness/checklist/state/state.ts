@@ -13,6 +13,9 @@ export const restoreChecklist = (): void => {
             .filter((task) => Array.isArray(saved) && saved.includes(task.id))
             .map((task) => task.id)
     );
+    if (readLocal<boolean>('notfall-ms-tracking-consent-v1', false) === true)
+        completed.add('tracking');
+    else completed.delete('tracking');
 };
 
 /** 🎯 Return a progress snapshot for the UI and aggregate tracking. */

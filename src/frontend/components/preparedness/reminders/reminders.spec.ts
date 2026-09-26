@@ -15,7 +15,7 @@ test('shows a dismissible demo and hides it when all tasks are complete', () => 
         document.querySelector<HTMLElement>('[data-reminder]')!;
     jest.advanceTimersByTime(12000);
     expect(notification.hidden).toBe(false);
-    expect(notification.textContent).toContain('6 Aufgaben');
+    expect(notification.textContent).toContain('7 Aufgaben');
     document.querySelector<HTMLButtonElement>('[data-reminder-close]')!.click();
     expect(notification.hidden).toBe(true);
     showReminder();

@@ -10,6 +10,7 @@ test('turns accents green at full completion, restores after reload and reverses
     tasks.forEach((task) => setComplete(task.id, true));
     renderProgress();
     expect(document.documentElement.dataset.preparedness).toBe('complete');
+    localStorage.setItem('notfall-ms-tracking-consent-v1', 'true');
     restoreChecklist();
     renderProgress();
     expect(document.documentElement.dataset.preparedness).toBe('complete');

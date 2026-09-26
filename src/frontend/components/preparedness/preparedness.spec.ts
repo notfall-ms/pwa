@@ -40,7 +40,7 @@ test('connects checklist, location, install events and opt-out through the mock'
     setupInstall();
     setupPreparedness();
     expect(document.querySelector('[data-todo-count]')?.textContent).toBe(
-        '☐ 6 offen'
+        '☐ 7 offen'
     );
     const toggle = document.querySelector<HTMLButtonElement>(
         '[data-tracking-toggle]'
@@ -50,7 +50,11 @@ test('connects checklist, location, install events and opt-out through the mock'
         document.querySelector<HTMLSelectElement>('[data-area-select]')!;
     select.value = '56';
     select.dispatchEvent(new Event('change'));
-    document.querySelector<HTMLInputElement>('[data-checklist] input')!.click();
+    document
+        .querySelector<HTMLInputElement>(
+            '[data-checklist] input[value=contacts]'
+        )!
+        .click();
     expect(document.querySelector('[data-todo-count]')?.textContent).toBe(
         '☐ 5 offen'
     );
@@ -62,7 +66,7 @@ test('connects checklist, location, install events and opt-out through the mock'
         )
     ).toBe(true);
     expect(getMockEvents().at(-1)).toMatchObject({
-        completed: 1,
+        completed: 2,
         district: 'Münster-West',
         installed: true,
     });
@@ -70,7 +74,11 @@ test('connects checklist, location, install events and opt-out through the mock'
         document.querySelector<HTMLButtonElement>('[data-pwa-install]')?.hidden
     ).toBe(true);
     toggle.click();
-    document.querySelector<HTMLInputElement>('[data-checklist] input')!.click();
+    document
+        .querySelector<HTMLInputElement>(
+            '[data-checklist] input[value=contacts]'
+        )!
+        .click();
     await track('snapshot');
     expect(getMockEvents()).toEqual([]);
     expect(document.querySelector('[data-tracking-status]')?.textContent).toBe(

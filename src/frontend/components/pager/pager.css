@@ -21,3 +21,12 @@
     color: #7c6b55;
     margin-top: 0.5rem;
 }
+
+[data-pager-pair] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+.pager-bluetooth-icon {
+    flex-shrink: 0;
+}

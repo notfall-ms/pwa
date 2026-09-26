@@ -1,5 +1,5 @@
 import { readLocal, writeLocal } from '../storage/storage';
-import { getProgress } from '../checklist/state/state';
+import { getProgress, setComplete } from '../checklist/state/state';
 import { getLocation } from '../location/state/state';
 import { wasInstalled } from '../../pwa/install/state/state';
 import { getResidentHash, identityKey } from './identity/identity';
@@ -15,15 +15,17 @@ let pending = Promise.resolve();
 export const isTrackingEnabled = (): boolean => enabled;
 
 /** 🎯 Withdraw consent immediately, including queued events and local identity. */
-export const setTrackingEnabled = (value: boolean): void => {
+export const setTrackingEnabled = (value: boolean): boolean => {
     enabled = value;
     epoch += 1;
-    writeLocal(consentKey, value);
+    const consentSaved = writeLocal(consentKey, value);
     if (!value) {
         mockTrackingClient.clear();
         writeLocal(identityKey, null);
     }
+    const taskSaved = setComplete('tracking', value);
     window.dispatchEvent(new Event('preparedness:tracking'));
+    return consentSaved && taskSaved;
 };
 
 /** 🎯 Serialize privacy-minimized snapshots through the replaceable mock client. */

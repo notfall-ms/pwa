@@ -1,5 +1,11 @@
 export const tasks = [
     {
+        id: 'tracking',
+        icon: '◉',
+        title: 'Wichtig: Rückmeldung „Ich bin sicher“ vorbereiten',
+        hint: 'Aktiviere freiwillig das Demo-Tracking. Damit soll die Stadt später wissen, dass du sicher bist. Aktuell bleibt alles lokal; die Stadt erhält noch keine Meldung.',
+    },
+    {
         id: 'contacts',
         icon: '☎',
         title: 'Wichtige Kontakte notieren',

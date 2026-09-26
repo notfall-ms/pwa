@@ -62,6 +62,7 @@ export const setupRegistration = async (development = false): Promise<void> => {
         watchUpdates(registration, reportError);
         void registration.update().catch(() => undefined);
         window.addEventListener('online', () => {
+            void refreshStatus().catch(showError);
             void registration.update().catch(() => undefined);
         });
         const ready = await navigator.serviceWorker.ready;

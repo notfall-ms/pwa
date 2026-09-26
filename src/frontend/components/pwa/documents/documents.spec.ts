@@ -105,3 +105,31 @@ test.each(['md', 'markdown'])(
         );
     }
 );
+
+test('downloads and caches a missing document so it is shown again', async () => {
+    const response = {
+        ok: true,
+        status: 200,
+        text: async () => 'Recovered',
+        clone: jest.fn(),
+    };
+    response.clone.mockReturnValue(response);
+    const put = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(window, 'caches', {
+        configurable: true,
+        value: {
+            open: async () => ({ match: async () => undefined, put }),
+        },
+    });
+    const fetchMock = jest.fn().mockResolvedValue(response);
+    Object.defineProperty(globalThis, 'fetch', {
+        configurable: true,
+        value: fetchMock,
+    });
+    await showDocuments(status);
+    expect(put).toHaveBeenCalledWith('/documents/beispiel.txt', response);
+    expect(document.querySelector('pre')?.textContent).toBe('Recovered');
+    expect(document.querySelector('[data-pwa-offline]')?.textContent).toBe(
+        '✓ 1 offline'
+    );
+});

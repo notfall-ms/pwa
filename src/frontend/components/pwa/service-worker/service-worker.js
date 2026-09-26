@@ -60,7 +60,15 @@ const cachedResponse = async (request) => {
     const cached = await cache.match(url.pathname);
     if (cached) return cached;
     try {
-        return await fetch(request);
+        const response = await fetch(request);
+        if (response.ok && response.status === 200) {
+            try {
+                await cache.put(url.pathname, response.clone());
+            } catch {
+                /* Storage may be full. */
+            }
+        }
+        return response;
     } catch {
         return new Response('Dieses Dokument ist offline nicht verfügbar.', {
             status: 503,

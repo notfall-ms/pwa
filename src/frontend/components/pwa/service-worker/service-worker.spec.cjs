@@ -219,3 +219,50 @@ test('lets the pager validate its own fresh feed in production and development',
         );
     }
 });
+
+test('development reopens precached documents with query strings while offline', async () => {
+    const worker = createWorker({
+        development: true,
+        entries: [['/documents/beispiel.txt', new Response('Saved document')]],
+    });
+    assert.equal(
+        await (await worker.fetch('/documents/beispiel.txt?download=1')).text(),
+        'Saved document'
+    );
+});
+
+test('development retains cached documents when the server returns an error', async () => {
+    const worker = createWorker({
+        development: true,
+        entries: [
+            [
+                'https://example.test/documents/beispiel.txt',
+                new Response('Saved document'),
+            ],
+        ],
+        fetch: async () => new Response('Unavailable', { status: 503 }),
+    });
+    assert.equal(
+        await (await worker.fetch('/documents/beispiel.txt?download=1')).text(),
+        'Saved document'
+    );
+});
+
+test('repairs a missing document cache after a successful fetch', async () => {
+    let online = true;
+    const worker = createWorker({
+        fetch: async () => {
+            if (!online) throw new Error('Offline');
+            return new Response('Recovered document');
+        },
+    });
+    assert.equal(
+        await (await worker.fetch('/documents/beispiel.txt')).text(),
+        'Recovered document'
+    );
+    online = false;
+    assert.equal(
+        await (await worker.fetch('/documents/beispiel.txt?download=1')).text(),
+        'Recovered document'
+    );
+});

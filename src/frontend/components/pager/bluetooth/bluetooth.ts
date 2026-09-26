@@ -106,8 +106,12 @@ export const createBluetoothPager = (onDisconnect: () => void) => {
             if (!bluetoothAvailable() || !bluetooth)
                 throw new Error('Bluetooth unavailable');
             try {
+                // device = await bluetooth.requestDevice({
+                //     filters: [{ services: [serviceUuid] }],
+                // });
                 device = await bluetooth.requestDevice({
-                    filters: [{ services: [serviceUuid] }],
+                    acceptAllDevices: true,
+                    optionalServices: [serviceUuid],
                 });
                 device.addEventListener('gattserverdisconnected', disconnected);
                 if (!device.gatt) throw new Error('GATT unavailable');

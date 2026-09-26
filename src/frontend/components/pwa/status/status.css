@@ -8,11 +8,17 @@
     justify-content: space-between;
     gap: 0.75rem;
     padding: 1rem clamp(1rem, 4vw, 3rem);
-    background: linear-gradient(120deg, #fffdf6f5, #fff4d9f5);
+    background: linear-gradient(120deg, #f3a39ff5, #fc3a04f5);
     border-bottom: 1px solid #edddb9;
     backdrop-filter: blur(16px);
     color: #503b33;
     box-shadow: 0 6px 24px #78512912;
+}
+:root[data-preparedness='complete'] .pwa-status .pwa-brand {
+  color: white;
+}
+:root[data-preparedness='complete'] .pwa-status {
+    background: linear-gradient(120deg, #24734ef5, #195b3df5);
 }
 .pwa-brand {
     display: flex;

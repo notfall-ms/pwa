@@ -71,3 +71,30 @@ API-Referenz: [Web Bluetooth](https://developer.chrome.com/docs/capabilities/blu
 Im Stadt-Pager „Bluetooth-Diagnose“ aufklappen. Das Protokoll zeigt Browserunterstützung und sicheren Kontext, Service-Filter, Geräteauswahl, GATT-Verbindung, Characteristic-Suche, Lesen (Byte-Anzahl), UTF-8/JSON/Validierung, lokale Speicherung und ACK-Schritte. Fehler enthalten den ursprünglichen Fehlernamen und die Fehlermeldung. Ein gestarteter Schritt ohne Abschluss zeigt, wo der Vorgang noch wartet.
 
 Die letzten 100 Einträge bleiben ausschließlich im Arbeitsspeicher dieser Sitzung. „Protokoll leeren“ entfernt sie. Es werden weder Feed-Inhalte noch Geräte-IDs aktiv protokolliert. Bei `requestDevice` bedeutet `NotFoundError` möglicherweise Abbruch oder keine passende Auswahl; der Fehler beweist nicht, dass kein Gerät vorhanden ist. Prüfen, ob der Windows-Sender den angegebenen Service tatsächlich im Advertising anbietet. Fehlendes ACK bleibt beim Sender-v4 erwartbar und verhindert den Empfang nicht.
+
+## WebSocket als Alternative
+
+Die kompakte Verbindungsleiste enthält Bluetooth, WebSocket, das gemeinsame Abrufintervall und einen Aktualisierungsbutton. Es ist jeweils eine Verbindung aktiv. Ein zweiter Klick auf die aktive Verbindung trennt sie; der Wechsel zur anderen Verbindung schließt die bisherige.
+
+Standardadresse ist `/ws` auf dem aktuellen Host einschließlich Port:
+
+- `http://192.168.4.1` → `ws://192.168.4.1/ws`
+- `https://notfall.ms` → `wss://notfall.ms/ws`
+
+Unter „Verbindungseinstellungen“ lässt sich die Adresse ändern. Sie wird nach erfolgreicher Verbindung lokal gespeichert. Auf einer HTTPS-Seite ist `wss://` erforderlich. Die HTTP-Kioskseite kann `ws://` verwenden; dies macht sie nicht zur offline installierbaren PWA. Für die pseudonyme ID verwendet die HTTP-Version `crypto.getRandomValues`, falls `crypto.randomUUID` fehlt.
+
+### Vertrag für den WebSocket-Server
+
+Der Kiosk/Server muss am Endpunkt `/ws` WebSocket-Verbindungen annehmen. Ein statischer HTTP-Dateiserver allein reicht nicht. Die Firmware des senseBox-Kiosks ist nicht Bestandteil dieser PWA-Änderung.
+
+1. Beim Verbindungsaufbau, bei manuellem Aktualisieren und im gewählten Intervall sendet die PWA `{"type":"get_messages"}`.
+2. Der Server antwortet mit einer vollständigen WebSocket-Nachricht im oben dokumentierten Format `{"messages":[...]}`. UTF-8-Text und binäres UTF-8 werden unterstützt. Zusätzliche vom Server ausgelöste Feeds werden ebenfalls sofort verarbeitet. „Manuell“ deaktiviert nur periodische Anfragen, nicht den Empfang solcher Feeds.
+3. Nach Validierung und erfolgreicher lokaler Speicherung sendet die PWA die gleichen ACK-JSON-Objekte wie über Bluetooth, ohne zusätzliche Hülle: `{"messageId":"…","deviceId":"pwa-…","status":"received","timestamp":"…"}`.
+
+Es gelten dieselben Regeln für `message ?? text`, Pflicht-Zeitstempel, Ablaufdaten und Deduplizierung. Gemeinsame lokale Inbox und Geräte-ID verhindern doppelte Nachrichten beim Transportwechsel innerhalb derselben Origin. Bei Verbindungsfehlern bleiben gespeicherte Nachrichten sichtbar. Verbindungsaufbau und Abruf warten höchstens zehn Sekunden auf einen Feed; danach kann erneut verbunden/aktualisiert werden.
+
+WebSocket `send()` bestätigt lediglich die Übergabe an den Sendepuffer. Da der bestehende Datenvertrag keine Serverantwort auf ein ACK definiert, bleiben WebSocket-ACKs in der lokalen Warteschlange und werden beim nächsten gültigen Feed erneut gesendet. Der Sender muss sie nach `(deviceId, messageId)` idempotent verarbeiten. Die Oberfläche unterscheidet „ACK zur Übertragung übergeben“ von der Bluetooth-Bestätigung. Ein ACK-Schreibfehler verwirft die empfangene Nachricht nicht.
+
+WebSocket-Fehler erscheinen ebenfalls in der aufklappbaren Verbindungsdiagnose. Bei generischen Verbindungsfehlern Adresse, WLAN, WebSocket-Server und ggf. TLS-Zertifikat prüfen.
+
+Referenzen: [WebSocket-Client](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications), [send() und Sendepuffer](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send).

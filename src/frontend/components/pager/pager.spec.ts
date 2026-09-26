@@ -1,5 +1,6 @@
 import { saveReceived } from './inbox/inbox';
 import { webcrypto } from 'node:crypto';
+import * as socketModule from './websocket/websocket';
 import { setupPager } from './pager';
 import {
     bluetoothAvailable,
@@ -35,6 +36,7 @@ beforeEach(() => {
     connection.connected.mockReturnValue(false);
 });
 afterEach(() => {
+    jest.restoreAllMocks();
     jest.clearAllTimers();
     jest.useRealTimers();
 });
@@ -160,4 +162,68 @@ test('restores persisted messages after reload instead of displaying the demo', 
     expect(
         document.querySelector('[data-pager-status]')?.textContent
     ).toContain('Lokal gespeichert');
+});
+
+test('switches transports, polls WebSocket and keeps the selected buttons in sync', async () => {
+    document.body.insertAdjacentHTML(
+        'beforeend',
+        '<button data-pager-websocket></button><input data-pager-socket-url>'
+    );
+    const messages = [
+        {
+            id: 'socket',
+            title: 'WLAN',
+            message: 'Vom Kiosk',
+            timestamp: '2026-09-26T11:45:00.000Z',
+        },
+    ];
+    let connected = false;
+    const socket = {
+        connect: jest.fn().mockImplementation(async () => {
+            connected = true;
+            return messages;
+        }),
+        read: jest.fn().mockResolvedValue(messages),
+        connected: () => connected,
+        disconnect: jest.fn(() => {
+            connected = false;
+        }),
+        ackStatus: () => 'sent' as const,
+    };
+    jest.spyOn(socketModule, 'createWebSocketPager').mockReturnValue(socket);
+    setupPager();
+    const button = document.querySelector<HTMLButtonElement>(
+        '[data-pager-websocket]'
+    )!;
+    const address = document.querySelector<HTMLInputElement>(
+        '[data-pager-socket-url]'
+    )!;
+    expect(address.value).toBe(socketModule.defaultSocketUrl());
+    button.click();
+    await flush();
+    expect(socket.connect).toHaveBeenCalledWith(
+        socketModule.defaultSocketUrl()
+    );
+    expect(connection.disconnect).toHaveBeenCalled();
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(
+        document.querySelector('[data-pager-messages]')?.textContent
+    ).toContain('Vom Kiosk');
+    jest.advanceTimersByTime(60000);
+    await flush();
+    expect(socket.read).toHaveBeenCalledTimes(1);
+    expect(connection.read).not.toHaveBeenCalled();
+    connection.pair.mockImplementation(async () => {
+        connection.connected.mockReturnValue(true);
+        return messages;
+    });
+    document.querySelector<HTMLButtonElement>('[data-pager-pair]')!.click();
+    await flush();
+    expect(connected).toBe(false);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(
+        document
+            .querySelector('[data-pager-pair]')!
+            .getAttribute('aria-pressed')
+    ).toBe('true');
 });

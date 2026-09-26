@@ -1,27 +1,38 @@
 <section class="preparedness-card pager" aria-labelledby="pager-title">
     <div class="preparedness-heading"><h2 id="pager-title">📟 Stadt-Pager</h2><span class="preparedness-pill" data-pager-status role="status">◷ Laden …</span></div>
     <div data-pager-messages aria-live="polite"></div>
-    <p class="preparedness-caption">Kopple einen kompatiblen Bluetooth-Sender, um Nachrichten aus deiner Nähe zu laden. Ohne Verbindung bleiben gespeicherte Nachrichten verfügbar. Wenn noch keine empfangen wurden, erscheint eine Beispielnachricht.</p>
-    <button type="button" data-pager-pair>
-        <svg class="pager-bluetooth-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg>
-        <span data-pager-pair-label>Bluetooth koppeln</span>
-    </button>
+    <div class="pager-controls" role="group" aria-label="Verbindung und Aktualisierung">
+        <button type="button" data-pager-pair aria-pressed="false" title="Bluetooth koppeln oder trennen">
+            <svg class="pager-bluetooth-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg>
+            <span data-pager-pair-label>Bluetooth</span>
+        </button>
+        <button type="button" data-pager-websocket aria-pressed="false" title="WebSocket verbinden oder trennen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3M7 12h10m-3-3 3 3-3 3"/></svg>
+            WebSocket
+        </button>
+        <label class="pager-interval" for="pager-interval"><span>Intervall</span>
+            <select id="pager-interval" data-pager-interval aria-describedby="pager-interval-help">
+                <option value="0">Manuell</option>
+                <option value="15">15 s</option>
+                <option value="30">30 s</option>
+                <option value="60" selected>1 min</option>
+                <option value="300">5 min</option>
+            </select>
+        </label>
+        <button type="button" data-pager-refresh aria-label="Nachrichten jetzt aktualisieren" title="Jetzt aktualisieren">↻</button>
+    </div>
     <p class="preparedness-caption" data-pager-bluetooth-status role="status"></p>
-    <label for="pager-interval">Nachrichten automatisch laden</label>
-    <select id="pager-interval" data-pager-interval aria-describedby="pager-interval-help">
-        <option value="0">Nur manuell</option>
-        <option value="15">Alle 15 Sekunden</option>
-        <option value="30">Alle 30 Sekunden</option>
-        <option value="60" selected>Jede Minute</option>
-        <option value="300">Alle 5 Minuten</option>
-    </select>
-    <p id="pager-interval-help" class="preparedness-caption" data-pager-interval-help>Automatisch nur bei geöffneter, sichtbarer App und bestehender Bluetooth-Verbindung.</p>
-    <button type="button" data-pager-refresh>↻ Nachrichten aktualisieren</button>
+    <details class="pager-connection-settings">
+        <summary>Verbindungseinstellungen</summary>
+        <label for="pager-socket-url">WebSocket-Adresse</label>
+        <input id="pager-socket-url" data-pager-socket-url type="url" spellcheck="false" autocomplete="off" placeholder="ws://192.168.4.1/ws">
+        <p id="pager-interval-help" class="preparedness-caption" data-pager-interval-help>Automatische Abrufe nur bei sichtbarer App. WebSocket empfängt zusätzlich neue Nachrichten vom Sender. Ohne Verbindung bleiben gespeicherte Nachrichten oder die Demo verfügbar.</p>
+    </details>
     <details class="pager-bluetooth-debug">
-        <summary>Bluetooth-Diagnose</summary>
+        <summary>Verbindungsdiagnose</summary>
         <p class="preparedness-caption">Die letzten 100 Schritte dieser Sitzung. Nachrichteninhalte und Geräte-IDs werden nicht protokolliert.</p>
         <p class="preparedness-caption">Kein Gerät in der Auswahl? Der Sender muss den oben protokollierten Service per Advertising anbieten. „NotFoundError“ kann auch bedeuten, dass die Auswahl abgebrochen wurde.</p>
-        <pre data-bluetooth-debug-log aria-label="Bluetooth-Diagnoseprotokoll"></pre>
+        <pre data-bluetooth-debug-log aria-label="Verbindungsdiagnoseprotokoll"></pre>
         <button type="button" data-bluetooth-debug-clear>Protokoll leeren</button>
     </details>
 </section>

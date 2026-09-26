@@ -44,3 +44,48 @@
     overflow-wrap: anywhere;
     font-size: 0.8rem;
 }
+
+.pager-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+.pager .pager-controls button,
+.pager .pager-controls select {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.85rem;
+}
+.pager .pager-controls button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.pager .pager-controls button[aria-pressed='true'] {
+    box-shadow: inset 0 0 0 2px var(--pwa-accent-dark);
+}
+.pager-interval {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0;
+    font-size: 0.8rem;
+}
+.pager-connection-settings {
+    margin-top: 0.5rem;
+}
+.pager-connection-settings summary {
+    cursor: pointer;
+}
+[data-pager-socket-url] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.3rem;
+}
+
+.pager .pager-controls select {
+    width: auto;
+    margin: 0;
+}

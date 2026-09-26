@@ -14,17 +14,3 @@
     --pwa-accent-shadow: #24734e20;
     --pwa-accent-hover-shadow: #24734e30;
 }
-:root[data-preparedness='complete']  .pwa-logo.logo--default {
-    display: none;
-}
-:root[data-preparedness='incomplete']  .pwa-logo.logo--ok {
-    display: none;
-}
-
-:root[data-preparedness='complete'] .pwa-logo.logo--default {
-    display: none;
-}
-
-:root[data-preparedness='complete']  .pwa-logo.logo--ok {
-    display: block;
-}

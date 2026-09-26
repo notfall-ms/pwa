@@ -9,22 +9,9 @@ menu:
   order: 10
 ---
 
-<div class="pwa-logo logo--default">
-    <img
-    class="logo"
-     width="240"
-    src="/assets/LOGO.svg"
-    alt="notfall.ms"
-/>
-</div>
-<div class="pwa-logo logo--ok">
-
-<img
-    class="logo"
-     width="240"
-    src="/assets/LOGO_OK.svg"
-    alt="notfall.ms"
-/>
+<div class="pwa-logo">
+    <img data-pwa-logo="default" width="240" height="205" src="/assets/LOGO.svg" alt="notfall.ms" loading="eager" />
+    <img data-pwa-logo="complete" width="240" height="205" src="/assets/LOGO_OK.svg" alt="notfall.ms – Vorsorge erledigt" loading="eager" />
 </div>
 {% include "../components/pwa/install/install.njk" %}
 {% include "../components/pager/pager.njk" %}

@@ -16,7 +16,7 @@ export const renderMessages = (
             const heading = document.createElement('h3');
             heading.textContent = message.title;
             const text = document.createElement('p');
-            text.textContent = message.text;
+            text.textContent = message.message;
             article.append(heading, text);
             if (message.demo) {
                 const badge = document.createElement('small');

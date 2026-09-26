@@ -6,7 +6,8 @@ const feed = {
         {
             id: 'soup',
             title: 'Suppe',
-            text: 'Um 19 Uhr am Digitalhub.',
+            timestamp: '2026-09-26T11:45:00.000Z',
+            message: 'Um 19 Uhr am Digitalhub.',
             demo: true,
         },
     ],
@@ -55,13 +56,52 @@ test('falls back to the last valid feed for offline or malformed responses', asy
     expect(put).not.toHaveBeenCalled();
 });
 
-test('rejects duplicate IDs and invalid expiration dates', () => {
-    expect(() =>
+test('deduplicates IDs and rejects invalid expiration dates', () => {
+    expect(
         parseMessages({ messages: [feed.messages[0], feed.messages[0]] })
-    ).toThrow();
+    ).toEqual(feed.messages);
     expect(() =>
         parseMessages({
             messages: [{ ...feed.messages[0], expiresAt: 'not a date' }],
         })
     ).toThrow();
+});
+
+test('prefers message and accepts legacy text without changing the sender timestamp', () => {
+    const original = feed.messages[0];
+    expect(
+        parseMessages({ messages: [{ ...original, text: 'Legacy' }] })[0]
+            .message
+    ).toBe(original.message);
+    expect(
+        parseMessages({
+            messages: [{ ...original, message: undefined, text: 'Legacy' }],
+        })[0]
+    ).toMatchObject({ message: 'Legacy', timestamp: original.timestamp });
+    expect(
+        parseMessages({
+            messages: [{ ...original, message: null, text: 'Legacy' }],
+        })[0].message
+    ).toBe('Legacy');
+});
+
+test.each([
+    undefined,
+    'invalid',
+    '2026-02-30T11:45:00.000Z',
+    '2026-09-26T11:45:00+02:00',
+])('requires a valid UTC sender timestamp: %s', (timestamp) => {
+    expect(() =>
+        parseMessages({ messages: [{ ...feed.messages[0], timestamp }] })
+    ).toThrow('Invalid timestamp');
+});
+
+test.each([
+    { message: undefined },
+    { message: 42, text: 'Legacy' },
+    { message: undefined, text: false },
+])('rejects missing or invalid message content', (fields) => {
+    expect(() =>
+        parseMessages({ messages: [{ ...feed.messages[0], ...fields }] })
+    ).toThrow('Invalid message');
 });

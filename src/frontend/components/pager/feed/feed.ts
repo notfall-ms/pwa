@@ -1,6 +1,19 @@
 import { pwaConfig } from '../../../../../pwa.config';
 import type { PagerMessage, PagerResult } from '../pager.d';
 
+const isUtcTimestamp = (value: unknown): value is string => {
+    if (
+        typeof value !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(value)
+    )
+        return false;
+    const time = Date.parse(value);
+    return (
+        Number.isFinite(time) &&
+        new Date(time).toISOString().slice(0, 19) === value.slice(0, 19)
+    );
+};
+
 /** 🎯 Validate the simple JSON pager contract before displaying or caching it. */
 export const parseMessages = (data: unknown): PagerMessage[] => {
     if (
@@ -10,19 +23,21 @@ export const parseMessages = (data: unknown): PagerMessage[] => {
         !Array.isArray(data.messages)
     )
         throw new Error('Invalid pager feed');
-    const ids = new Set<string>();
-    return data.messages.map((item: unknown) => {
+    const validated = data.messages.map((item: unknown) => {
         if (!item || typeof item !== 'object')
             throw new Error('Invalid message');
         const message = item as PagerMessage;
+        const content = message.message ?? message.text;
         if (
             typeof message.id !== 'string' ||
             !message.id ||
-            ids.has(message.id) ||
             typeof message.title !== 'string' ||
-            typeof message.text !== 'string'
+            typeof content !== 'string' ||
+            (message.text !== undefined && typeof message.text !== 'string')
         )
             throw new Error('Invalid message');
+        if (!isUtcTimestamp(message.timestamp))
+            throw new Error('Invalid timestamp');
         if (
             message.expiresAt !== undefined &&
             (typeof message.expiresAt !== 'string' ||
@@ -31,9 +46,11 @@ export const parseMessages = (data: unknown): PagerMessage[] => {
             throw new Error('Invalid expiry');
         if (message.demo !== undefined && typeof message.demo !== 'boolean')
             throw new Error('Invalid demo flag');
-        ids.add(message.id);
-        return message;
+        return { ...message, message: content };
     });
+    return [
+        ...new Map(validated.map((message) => [message.id, message])).values(),
+    ];
 };
 
 const loadCached = async (): Promise<PagerResult> => {

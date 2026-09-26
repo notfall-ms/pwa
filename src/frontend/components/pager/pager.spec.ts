@@ -1,3 +1,5 @@
+import { saveReceived } from './inbox/inbox';
+import { webcrypto } from 'node:crypto';
 import { setupPager } from './pager';
 import {
     bluetoothAvailable,
@@ -12,6 +14,7 @@ const flush = async () => {
     await Promise.resolve();
 };
 const connection = {
+    ackStatus: jest.fn().mockReturnValue('unavailable'),
     pair: jest.fn(),
     read: jest.fn(),
     connected: jest.fn(),
@@ -42,9 +45,15 @@ test('shows a labelled demo, loads Bluetooth messages and falls back on read fai
         document.querySelector('[data-pager-status]')?.textContent
     ).toContain('Demo');
     connection.pair.mockResolvedValue([
-        { id: 'live', title: 'Sender', text: 'Live-Nachricht' },
+        {
+            id: 'live',
+            title: 'Sender',
+            timestamp: '2026-09-26T11:45:00.000Z',
+            message: 'Live-Nachricht',
+        },
     ]);
     document.querySelector<HTMLButtonElement>('[data-pager-pair]')!.click();
+    connection.connected.mockReturnValue(true);
     await flush();
     expect(
         document.querySelector('[data-pager-messages]')?.textContent
@@ -129,4 +138,26 @@ test('restores the interval and skips hidden, disconnected and overlapping reads
     expect(connection.read).toHaveBeenCalledTimes(1);
     resolve([]);
     await flush();
+});
+
+test('restores persisted messages after reload instead of displaying the demo', () => {
+    Object.defineProperty(globalThis, 'crypto', {
+        configurable: true,
+        value: webcrypto,
+    });
+    saveReceived([
+        {
+            id: 'saved',
+            title: 'Gespeichert',
+            message: 'Bleibt erhalten',
+            timestamp: '2026-09-26T11:45:00.000Z',
+        },
+    ]);
+    setupPager();
+    expect(
+        document.querySelector('[data-pager-messages]')?.textContent
+    ).toContain('Bleibt erhalten');
+    expect(
+        document.querySelector('[data-pager-status]')?.textContent
+    ).toContain('Lokal gespeichert');
 });

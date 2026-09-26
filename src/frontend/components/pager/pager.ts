@@ -3,6 +3,7 @@ import {
     bluetoothAvailable,
     createBluetoothPager,
 } from './bluetooth/bluetooth';
+import { savedMessages } from './inbox/inbox';
 import { renderMessages } from './view/view';
 import './pager.css';
 import { readLocal, writeLocal } from '../preparedness/storage/storage';
@@ -26,20 +27,23 @@ export const setupPager = (): void => {
         '[data-pager-bluetooth-status]'
     );
     const fallback = (): void => {
-        renderMessages(container, demoMessages);
-        status.textContent = '◌ Beispielnachricht · Demo';
+        const saved = savedMessages();
+        renderMessages(container, saved.length ? saved : demoMessages);
+        status.textContent = saved.length
+            ? '◌ Lokal gespeicherte Nachrichten'
+            : '◌ Beispielnachricht · Demo';
     };
     const bluetooth = createBluetoothPager(() => {
         fallback();
         if (pairLabel) pairLabel.textContent = 'Bluetooth koppeln';
         if (bluetoothStatus)
             bluetoothStatus.textContent =
-                'Verbindung getrennt. Beispielnachricht wird angezeigt.';
+                'Verbindung getrennt. Gespeicherte Nachrichten oder die Demo werden angezeigt.';
     });
     if (pair) pair.disabled = !bluetoothAvailable();
     if (bluetoothStatus && !bluetoothAvailable())
         bluetoothStatus.textContent =
-            'Bluetooth ist in diesem Browser nicht verfügbar. Beispielnachricht wird angezeigt.';
+            'Bluetooth ist in diesem Browser nicht verfügbar. Gespeicherte Nachrichten oder die Demo werden angezeigt.';
     const intervalSelect = document.querySelector<HTMLSelectElement>(
         '[data-pager-interval]'
     );
@@ -64,19 +68,27 @@ export const setupPager = (): void => {
             const messages = await (pairing
                 ? bluetooth.pair()
                 : bluetooth.read());
+            if (!bluetooth.connected()) {
+                fallback();
+                return;
+            }
             renderMessages(container, messages);
             status.textContent = '● Über Bluetooth geladen';
             if (pairLabel) pairLabel.textContent = 'Bluetooth trennen';
             if (bluetoothStatus)
                 bluetoothStatus.textContent =
-                    'Verbunden. Aktualisierung gemäß deiner Auswahl.';
+                    bluetooth.ackStatus() === 'unavailable'
+                        ? 'Verbunden. Empfangsbestätigung wird von diesem Sender nicht unterstützt.'
+                        : bluetooth.ackStatus() === 'pending'
+                          ? 'Nachrichten gespeichert. Empfangsbestätigung wird beim nächsten Abruf erneut versucht.'
+                          : 'Nachrichten gespeichert und Empfang bestätigt.';
         } catch {
             bluetooth.disconnect();
             fallback();
             if (pairLabel) pairLabel.textContent = 'Bluetooth koppeln';
             if (bluetoothStatus)
                 bluetoothStatus.textContent =
-                    'Kopplung abgebrochen oder Nachrichten nicht lesbar. Beispielnachricht wird angezeigt.';
+                    'Kopplung abgebrochen oder Nachrichten konnten nicht gelesen bzw. gespeichert werden. Gespeicherte Nachrichten oder die Demo werden angezeigt.';
         } finally {
             loading = false;
             if (refresh) refresh.disabled = false;

@@ -1,7 +1,9 @@
 export type PagerMessage = {
     id: string;
     title: string;
-    text: string;
+    message: string;
+    timestamp: string;
+    text?: string;
     demo?: boolean;
     expiresAt?: string;
 };

@@ -6,13 +6,15 @@ test('renders plain text and excludes expired messages', () => {
         {
             id: 'current',
             title: 'Digitalhub',
-            text: '<img src=x onerror=alert(1)>',
+            timestamp: '2026-09-26T11:45:00.000Z',
+            message: '<img src=x onerror=alert(1)>',
             demo: true,
         },
         {
             id: 'old',
             title: 'Gestern',
-            text: 'Alt',
+            timestamp: '2026-09-26T11:45:00.000Z',
+            message: 'Alt',
             expiresAt: '2000-01-01T00:00:00Z',
         },
     ]);

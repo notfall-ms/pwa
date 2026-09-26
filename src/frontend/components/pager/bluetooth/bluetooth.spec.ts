@@ -238,3 +238,51 @@ test.each(['service', 'messages', 'read'])(
         expect(f.device.gatt.disconnect).toHaveBeenCalled();
     }
 );
+
+test('reports the failed pairing step and original browser error', async () => {
+    const f = fixture();
+    const report = jest.fn();
+    f.requestDevice.mockRejectedValue(
+        new DOMException(
+            'User cancelled the requestDevice chooser.',
+            'NotFoundError'
+        )
+    );
+    await expect(
+        createBluetoothPager(jest.fn(), report).pair()
+    ).rejects.toThrow('User cancelled');
+    expect(report).toHaveBeenCalledWith(
+        expect.objectContaining({
+            step: 'Geräteauswahl (requestDevice)',
+            state: 'error',
+            detail: 'NotFoundError: User cancelled the requestDevice chooser.',
+        })
+    );
+    expect(report).toHaveBeenCalledWith(
+        expect.objectContaining({
+            step: 'Gerätefilter',
+            detail: expect.stringContaining(serviceUuid),
+        })
+    );
+});
+
+test('diagnoses ACK failures without logging message contents or pseudonymous IDs', async () => {
+    const f = fixture();
+    const report = jest.fn();
+    f.ack.writeValueWithResponse.mockRejectedValue(
+        new DOMException('Write failed', 'NetworkError')
+    );
+    expect(await createBluetoothPager(jest.fn(), report).pair()).toEqual(
+        messages
+    );
+    expect(report).toHaveBeenCalledWith(
+        expect.objectContaining({
+            step: `ACK schreiben (${ackUuid})`,
+            state: 'error',
+            detail: 'NetworkError: Write failed',
+        })
+    );
+    const log = JSON.stringify(report.mock.calls);
+    expect(log).not.toContain(messages[0].message);
+    expect(log).not.toContain(readInbox()!.deviceId);
+});

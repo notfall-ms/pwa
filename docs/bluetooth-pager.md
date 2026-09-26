@@ -65,3 +65,9 @@ Nachrichten bleiben nach Neuladen und Verbindungsverlust verfügbar. Nur wenn ke
 Automatisierte Tests verwenden GATT-Mocks. Ein echter Windows-/Handy-Hardwaretest ist zusätzlich erforderlich.
 
 API-Referenz: [Web Bluetooth](https://developer.chrome.com/docs/capabilities/bluetooth).
+
+## Bluetooth-Diagnose
+
+Im Stadt-Pager „Bluetooth-Diagnose“ aufklappen. Das Protokoll zeigt Browserunterstützung und sicheren Kontext, Service-Filter, Geräteauswahl, GATT-Verbindung, Characteristic-Suche, Lesen (Byte-Anzahl), UTF-8/JSON/Validierung, lokale Speicherung und ACK-Schritte. Fehler enthalten den ursprünglichen Fehlernamen und die Fehlermeldung. Ein gestarteter Schritt ohne Abschluss zeigt, wo der Vorgang noch wartet.
+
+Die letzten 100 Einträge bleiben ausschließlich im Arbeitsspeicher dieser Sitzung. „Protokoll leeren“ entfernt sie. Es werden weder Feed-Inhalte noch Geräte-IDs aktiv protokolliert. Bei `requestDevice` bedeutet `NotFoundError` möglicherweise Abbruch oder keine passende Auswahl; der Fehler beweist nicht, dass kein Gerät vorhanden ist. Prüfen, ob der Windows-Sender den angegebenen Service tatsächlich im Advertising anbietet. Fehlendes ACK bleibt beim Sender-v4 erwartbar und verhindert den Empfang nicht.

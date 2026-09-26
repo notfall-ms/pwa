@@ -3,6 +3,7 @@ import {
     bluetoothAvailable,
     createBluetoothPager,
 } from './bluetooth/bluetooth';
+import { setupBluetoothDebug } from './bluetooth/debug/debug';
 import { savedMessages } from './inbox/inbox';
 import { renderMessages } from './view/view';
 import './pager.css';
@@ -33,13 +34,14 @@ export const setupPager = (): void => {
             ? '◌ Lokal gespeicherte Nachrichten'
             : '◌ Beispielnachricht · Demo';
     };
+    const reportBluetooth = setupBluetoothDebug();
     const bluetooth = createBluetoothPager(() => {
         fallback();
         if (pairLabel) pairLabel.textContent = 'Bluetooth koppeln';
         if (bluetoothStatus)
             bluetoothStatus.textContent =
                 'Verbindung getrennt. Gespeicherte Nachrichten oder die Demo werden angezeigt.';
-    });
+    }, reportBluetooth);
     if (pair) pair.disabled = !bluetoothAvailable();
     if (bluetoothStatus && !bluetoothAvailable())
         bluetoothStatus.textContent =

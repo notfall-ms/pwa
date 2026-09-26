@@ -17,4 +17,11 @@
     </select>
     <p id="pager-interval-help" class="preparedness-caption" data-pager-interval-help>Automatisch nur bei geöffneter, sichtbarer App und bestehender Bluetooth-Verbindung.</p>
     <button type="button" data-pager-refresh>↻ Nachrichten aktualisieren</button>
+    <details class="pager-bluetooth-debug">
+        <summary>Bluetooth-Diagnose</summary>
+        <p class="preparedness-caption">Die letzten 100 Schritte dieser Sitzung. Nachrichteninhalte und Geräte-IDs werden nicht protokolliert.</p>
+        <p class="preparedness-caption">Kein Gerät in der Auswahl? Der Sender muss den oben protokollierten Service per Advertising anbieten. „NotFoundError“ kann auch bedeuten, dass die Auswahl abgebrochen wurde.</p>
+        <pre data-bluetooth-debug-log aria-label="Bluetooth-Diagnoseprotokoll"></pre>
+        <button type="button" data-bluetooth-debug-clear>Protokoll leeren</button>
+    </details>
 </section>

@@ -7,5 +7,14 @@
         <span data-pager-pair-label>Bluetooth koppeln</span>
     </button>
     <p class="preparedness-caption" data-pager-bluetooth-status role="status"></p>
+    <label for="pager-interval">Nachrichten automatisch laden</label>
+    <select id="pager-interval" data-pager-interval aria-describedby="pager-interval-help">
+        <option value="0">Nur manuell</option>
+        <option value="15">Alle 15 Sekunden</option>
+        <option value="30">Alle 30 Sekunden</option>
+        <option value="60" selected>Jede Minute</option>
+        <option value="300">Alle 5 Minuten</option>
+    </select>
+    <p id="pager-interval-help" class="preparedness-caption" data-pager-interval-help>Automatisch nur bei geöffneter, sichtbarer App und bestehender Bluetooth-Verbindung.</p>
     <button type="button" data-pager-refresh>↻ Nachrichten aktualisieren</button>
 </section>

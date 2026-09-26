@@ -5,6 +5,10 @@ import {
 } from './bluetooth/bluetooth';
 import { renderMessages } from './view/view';
 import './pager.css';
+import { readLocal, writeLocal } from '../preparedness/storage/storage';
+
+const refreshKey = 'notfall-ms-pager-refresh-seconds-v1';
+const intervals = [0, 15, 30, 60, 300];
 
 /** 🎯 Read paired Bluetooth messages with an explicitly labelled local demo fallback. */
 export const setupPager = (): void => {
@@ -36,6 +40,13 @@ export const setupPager = (): void => {
     if (bluetoothStatus && !bluetoothAvailable())
         bluetoothStatus.textContent =
             'Bluetooth ist in diesem Browser nicht verfügbar. Beispielnachricht wird angezeigt.';
+    const intervalSelect = document.querySelector<HTMLSelectElement>(
+        '[data-pager-interval]'
+    );
+    const savedInterval = readLocal<number>(refreshKey, 60);
+    let seconds = intervals.includes(savedInterval) ? savedInterval : 60;
+    if (intervalSelect) intervalSelect.value = String(seconds);
+    let timer: number | undefined;
     let loading = false;
     const update = async (pairing = false): Promise<void> => {
         if (loading) return;
@@ -58,7 +69,7 @@ export const setupPager = (): void => {
             if (pairLabel) pairLabel.textContent = 'Bluetooth trennen';
             if (bluetoothStatus)
                 bluetoothStatus.textContent =
-                    'Verbunden. Nachrichten werden regelmäßig aktualisiert.';
+                    'Verbunden. Aktualisierung gemäß deiner Auswahl.';
         } catch {
             bluetooth.disconnect();
             fallback();
@@ -84,11 +95,27 @@ export const setupPager = (): void => {
     refresh?.addEventListener('click', () => {
         void update();
     });
-    window.addEventListener('online', () => {
-        void update();
+    const schedule = (): void => {
+        window.clearInterval(timer);
+        timer = undefined;
+        if (seconds > 0) {
+            timer = window.setInterval(() => {
+                if (!document.hidden && bluetooth.connected()) void update();
+            }, seconds * 1000);
+        }
+    };
+    intervalSelect?.addEventListener('change', () => {
+        const value = Number(intervalSelect.value);
+        if (!intervals.includes(value)) return;
+        seconds = value;
+        const saved = writeLocal(refreshKey, seconds);
+        const help = document.querySelector('[data-pager-interval-help]');
+        if (help)
+            help.textContent = saved
+                ? 'Automatisch nur bei geöffneter, sichtbarer App und bestehender Bluetooth-Verbindung.'
+                : 'Auswahl gilt nur für diese Sitzung. Speichern ist nicht verfügbar.';
+        schedule();
     });
-    window.setInterval(() => {
-        if (!document.hidden) void update();
-    }, 60000);
+    schedule();
     void update();
 };

@@ -23,6 +23,9 @@ export const setupPager = (): void => {
     );
     const status = document.querySelector('[data-pager-status]');
     if (!container || !status) return;
+    const kiosk = !!document.querySelector(
+        'meta[name="notfall-ms-kiosk"][content="1"]'
+    );
     const pair = document.querySelector<HTMLButtonElement>('[data-pager-pair]');
     const socketButton = document.querySelector<HTMLButtonElement>(
         '[data-pager-websocket]'
@@ -39,26 +42,54 @@ export const setupPager = (): void => {
     const storedAddress = readLocal<unknown>(socketKey, '');
     if (address)
         address.value =
-            typeof storedAddress === 'string' && storedAddress
+            !kiosk && typeof storedAddress === 'string' && storedAddress
                 ? storedAddress
                 : defaultSocketUrl();
-    let active: Connection = 'bluetooth';
+    let active: Connection = kiosk ? 'websocket' : 'bluetooth';
     let loading = false;
+    let suspended = false;
+    let stopped = false;
+    let generation = 0;
+    let retry: number | undefined;
+    let retryDelay = 1000;
+    let lastSnapshot: PagerMessage[] | undefined;
     const report = setupBluetoothDebug();
     const fallback = (): void => {
+        if (kiosk) {
+            if (lastSnapshot !== undefined)
+                renderMessages(container, lastSnapshot);
+            else
+                container.textContent =
+                    'Noch keine Meldungen von dieser Box empfangen.';
+            status.textContent =
+                lastSnapshot !== undefined
+                    ? '◌ Verbindung unterbrochen · letzter empfangener Stand'
+                    : '◌ Box derzeit nicht erreichbar';
+            return;
+        }
         const saved = savedMessages();
         renderMessages(container, saved.length ? saved : demoMessages);
         status.textContent = saved.length
             ? '◌ Lokal gespeicherte Nachrichten'
             : '◌ Beispielnachricht · Demo';
     };
+    const reconnect = (): void => {
+        if (!kiosk || suspended || stopped || retry !== undefined) return;
+        retry = window.setTimeout(() => {
+            retry = undefined;
+            void update('websocket');
+        }, retryDelay);
+        retryDelay = Math.min(retryDelay * 2, 15000);
+    };
     const disconnected = (source: Connection): void => {
         if (active !== source) return;
         fallback();
         if (connectionStatus)
-            connectionStatus.textContent =
-                'Verbindung getrennt. Gespeicherte Nachrichten bleiben verfügbar.';
+            connectionStatus.textContent = kiosk
+                ? 'WLAN-Verbindung zur Box unterbrochen. Die Verbindung wird automatisch erneut versucht.'
+                : 'Verbindung getrennt. Gespeicherte Nachrichten bleiben verfügbar.';
         controls();
+        reconnect();
     };
     const bluetooth = createBluetoothPager(
         () => disconnected('bluetooth'),
@@ -69,7 +100,8 @@ export const setupPager = (): void => {
             if (active === 'websocket') show(messages);
         },
         () => disconnected('websocket'),
-        report
+        report,
+        { snapshot: kiosk }
     );
     const transport = () => (active === 'bluetooth' ? bluetooth : websocket);
     const controls = (): void => {
@@ -92,8 +124,12 @@ export const setupPager = (): void => {
             );
             socketButton.title =
                 active === 'websocket' && websocket.connected()
-                    ? 'WebSocket trennen'
-                    : 'WebSocket verbinden';
+                    ? kiosk
+                        ? 'WLAN-Verbindung trennen'
+                        : 'WebSocket trennen'
+                    : kiosk
+                      ? 'WLAN-Verbindung zur Box herstellen'
+                      : 'WebSocket verbinden';
         }
         if (refresh) refresh.disabled = loading;
         if (address) address.disabled = loading || websocket.connected();
@@ -103,26 +139,37 @@ export const setupPager = (): void => {
             fallback();
             return;
         }
+        if (kiosk) {
+            lastSnapshot = messages;
+            retryDelay = 1000;
+            window.clearTimeout(retry);
+            retry = undefined;
+        }
         renderMessages(container, messages);
-        status.textContent =
-            active === 'bluetooth'
-                ? '● Über Bluetooth geladen'
-                : '● Über WebSocket geladen';
+        status.textContent = kiosk
+            ? '● Krisenstab · live über WLAN'
+            : active === 'bluetooth'
+              ? '● Über Bluetooth geladen'
+              : '● Über WebSocket geladen';
         if (connectionStatus) {
             const ack = transport().ackStatus();
-            connectionStatus.textContent =
-                ack === 'pending'
-                    ? 'Gespeichert · Empfangsbestätigung wird erneut versucht.'
-                    : active === 'websocket'
-                      ? 'Gespeichert · ACK zur Übertragung übergeben.'
-                      : ack === 'unavailable'
-                        ? 'Verbunden · Sender unterstützt keine Empfangsbestätigung.'
-                        : 'Gespeichert · Empfang bestätigt.';
+            connectionStatus.textContent = kiosk
+                    ? ack === 'unavailable'
+                        ? 'Live empfangen · nur in dieser Sitzung sichtbar. Lokales Speichern ist nicht verfügbar; keine Empfangsbestätigung gesendet.'
+                        : 'Live empfangen und lokal gespeichert.'
+                : ack === 'pending'
+                  ? 'Gespeichert · Empfangsbestätigung wird erneut versucht.'
+                  : active === 'websocket'
+                    ? 'Gespeichert · ACK zur Übertragung übergeben.'
+                    : ack === 'unavailable'
+                      ? 'Verbunden · Sender unterstützt keine Empfangsbestätigung.'
+                      : 'Gespeichert · Empfang bestätigt.';
         }
         controls();
     };
     const update = async (connect?: Connection): Promise<void> => {
-        if (loading) return;
+        if (loading || (kiosk && (suspended || stopped))) return;
+        const currentGeneration = generation;
         loading = true;
         controls();
         try {
@@ -132,6 +179,7 @@ export const setupPager = (): void => {
                 active = connect;
             } else if (!transport().connected()) {
                 fallback();
+                reconnect();
                 return;
             }
             if (connectionStatus)
@@ -139,12 +187,16 @@ export const setupPager = (): void => {
             let messages: PagerMessage[];
             if (connect === 'bluetooth') messages = await bluetooth.pair();
             else if (connect === 'websocket') {
-                const url = address?.value.trim() || defaultSocketUrl();
+                const url = kiosk
+                    ? defaultSocketUrl()
+                    : address?.value.trim() || defaultSocketUrl();
                 messages = await websocket.connect(url);
-                writeLocal(socketKey, url);
+                if (!kiosk) writeLocal(socketKey, url);
             } else messages = await transport().read();
+            if (currentGeneration !== generation || suspended) return;
             show(messages);
         } catch (error) {
+            if (currentGeneration !== generation || suspended) return;
             transport().disconnect();
             fallback();
             if (connectionStatus)
@@ -152,22 +204,41 @@ export const setupPager = (): void => {
                     active === 'websocket' && error instanceof Error
                         ? error.message
                         : 'Verbindung oder Empfang fehlgeschlagen. Details in der Verbindungsdiagnose.';
+            reconnect();
         } finally {
-            loading = false;
-            controls();
+            if (currentGeneration === generation) {
+                loading = false;
+                controls();
+            }
         }
     };
     const toggle = (source: Connection): void => {
         if (loading) return;
         if (active === source && transport().connected()) {
+            if (kiosk) {
+                stopped = true;
+                window.clearTimeout(retry);
+                retry = undefined;
+            }
             transport().disconnect();
             disconnected(source);
-        } else void update(source);
+            if (kiosk && connectionStatus)
+                connectionStatus.textContent =
+                    'WLAN-Verbindung zur Box getrennt. Mit „WLAN“ erneut verbinden.';
+        } else {
+            stopped = false;
+            void update(source);
+        }
     };
     pair?.addEventListener('click', () => toggle('bluetooth'));
     socketButton?.addEventListener('click', () => toggle('websocket'));
     refresh?.addEventListener('click', () => {
-        void update();
+        if (kiosk && !websocket.connected()) {
+            stopped = false;
+            window.clearTimeout(retry);
+            retry = undefined;
+            void update('websocket');
+        } else void update();
     });
     const intervalSelect = document.querySelector<HTMLSelectElement>(
         '[data-pager-interval]'
@@ -179,7 +250,13 @@ export const setupPager = (): void => {
     const schedule = (): void => {
         window.clearInterval(timer);
         timer = undefined;
-        if (seconds > 0)
+        if (kiosk) {
+            // A bounded request timeout also detects silently lost WLAN links.
+            timer = window.setInterval(() => {
+                if (!suspended && !stopped && websocket.connected())
+                    void update();
+            }, 15000);
+        } else if (seconds > 0)
             timer = window.setInterval(() => {
                 if (!document.hidden && transport().connected()) void update();
             }, seconds * 1000);
@@ -199,4 +276,36 @@ export const setupPager = (): void => {
     controls();
     schedule();
     fallback();
+    if (kiosk) {
+        if (pair) pair.hidden = true;
+        if (socketButton) socketButton.textContent = 'WLAN';
+        intervalSelect?.closest('label')?.setAttribute('hidden', '');
+        const section = container.closest('section') || document;
+        section
+            .querySelector<HTMLElement>('.pager-connection-settings')
+            ?.setAttribute('hidden', '');
+        const diagnosticHint = section.querySelector(
+            '.pager-bluetooth-debug p:nth-of-type(2)'
+        );
+        if (diagnosticHint)
+            diagnosticHint.textContent =
+                'Bei Verbindungsproblemen prüfen, ob dieses Gerät weiterhin mit dem WLAN der Box verbunden ist.';
+        status.textContent = '◷ Krisenstab verbinden …';
+        window.addEventListener('pagehide', () => {
+            suspended = true;
+            ++generation;
+            loading = false;
+            window.clearTimeout(retry);
+            retry = undefined;
+            window.clearInterval(timer);
+            websocket.disconnect();
+        });
+        window.addEventListener('pageshow', () => {
+            if (!suspended) return;
+            suspended = false;
+            schedule();
+            if (!stopped) void update('websocket');
+        });
+        void update('websocket');
+    }
 };

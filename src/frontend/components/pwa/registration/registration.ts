@@ -39,7 +39,19 @@ const showError = (): void => {
 /** 🎯 Register the worker and track its lifecycle. */
 export const setupRegistration = async (development = false): Promise<void> => {
     if (!('serviceWorker' in navigator) || !window.isSecureContext) {
-        showError();
+        try {
+            const response = await fetch('/kiosk-info.json', { cache: 'no-store' });
+            if (!response.ok) throw new Error('No local kiosk');
+            const status: PwaStatus = await response.json();
+            if (!Array.isArray(status.documents)) throw new Error('Invalid kiosk metadata');
+            await showDocuments(status, true);
+            setStatus('[data-pwa-version]', `◈ v${status.version} · Box`);
+            setStatus('[data-pwa-install-help]', 'Die Dokumente sind über dieses WLAN verfügbar. Zum Behalten bitte herunterladen. Eine Offline-App-Installation benötigt HTTPS.');
+            const button = document.querySelector<HTMLButtonElement>('[data-pwa-install]');
+            if (button) { button.disabled = true; button.hidden = true; }
+        } catch {
+            showError();
+        }
         return;
     }
     let controlled = !!navigator.serviceWorker.controller;

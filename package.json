@@ -1,7 +1,7 @@
 {
-  "name": "eleventy-nunjucks-template",
+  "name": "notfall-ms-pwa",
   "version": "1.1.2",
-  "description": "my website",
+  "description": "NotfallMS citizen information PWA and local device kiosk",
   "main": "index.html",
   "scripts": {
     "init": "robi init",
@@ -14,7 +14,7 @@
     "app": "tsx src/setup/scripts/app.ts",
     "health": "npm run task health",
     "dev": "npm run task dev",
-    "build": "NODE_ENV=production tsx src/setup/scripts/build.ts",
+    "build": "node scripts/build-site.mjs",
     "start:healthcheck_wait": "until curl -sf -o /dev/null http://localhost:3000/@vite/client; do sleep 0.2; done; npm run build:healthcheck_fast; wait",
     "build:healthcheck": "npm run build_appX -- healthcheck",
     "build:healthcheck_fast": "npm run build_appX -- healthcheck --fast",
@@ -23,11 +23,12 @@
     "watch:healthcheck": "chokidar 'src/frontend' -c 'npm run build:healthcheck_fast'",
     "build:api": "npm run build_appX -- api",
     "build_appX": "sh -c 'tsx src/backend/apps/$1/index.ts $2' --",
-    "start_app": "sh -c 'tsx watch --clear-screen=false src/backend/apps/$1/index.ts' --"
+    "start_app": "sh -c 'tsx watch --clear-screen=false src/backend/apps/$1/index.ts' --",
+    "build:kiosk": "node scripts/build-site.mjs --kiosk"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/willi84/XXX-XXX.git"
+    "url": "git+https://github.com/notfall-ms/pwa.git"
   },
   "keywords": [
     "website",
@@ -37,9 +38,9 @@
   "author": "Robert Willemelis",
   "license": "SEE LICENSE in LICENSE.md",
   "bugs": {
-    "url": "https://github.com/willi84/XXX-XXX/issues"
+    "url": "https://github.com/notfall-ms/pwa/issues"
   },
-  "homepage": "https://github.com/willi84/XXX-XXX#readme",
+  "homepage": "https://github.com/notfall-ms/pwa#readme",
   "devDependencies": {
     "@11ty/eleventy": "^1.0.0",
     "@robert.tools/cmd": "^1.0.0",

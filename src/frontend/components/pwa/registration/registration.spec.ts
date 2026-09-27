@@ -14,6 +14,21 @@ const status = {
     cacheName: 'notfall-ms-sample',
     documents: ['/documents/beispiel.txt'],
 };
+
+test('loads box documents on HTTP without attempting service worker registration', async () => {
+    Object.defineProperty(window, 'isSecureContext', { configurable: true, value: false });
+    document.body.innerHTML = '<button data-pwa-install>Install</button>';
+    const register = jest.fn();
+    Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { register } });
+    Object.defineProperty(globalThis, 'fetch', {
+        configurable: true,
+        value: jest.fn().mockResolvedValue({ ok: true, json: async () => status }),
+    });
+    await setupRegistration();
+    expect(showDocuments).toHaveBeenCalledWith(status, true);
+    expect(register).not.toHaveBeenCalled();
+    expect(document.querySelector<HTMLButtonElement>('[data-pwa-install]')?.hidden).toBe(true);
+});
 const worker = {
     postMessage: jest.fn((message, ports) => {
         if (message.type === 'GET_STATUS') ports[0].deliver(status);

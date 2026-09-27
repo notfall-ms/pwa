@@ -29,6 +29,18 @@ beforeEach(() => {
         '<div data-pwa-documents></div><p data-pwa-documents-status></p><span data-pwa-offline></span>';
 });
 
+test('shows kiosk documents without CacheStorage and does not promise phone offline storage', async () => {
+    Object.defineProperty(window, 'caches', { configurable: true, value: undefined });
+    Object.defineProperty(globalThis, 'fetch', {
+        configurable: true,
+        value: jest.fn().mockResolvedValue({ ok: true, status: 200, text: async () => 'From the box' }),
+    });
+    await showDocuments(status, true);
+    expect(document.querySelector('pre')?.textContent).toBe('From the box');
+    expect(document.querySelector('.pwa-document-badge')?.textContent).toBe('Auf dieser Box');
+    expect(document.querySelector('[data-pwa-offline]')?.textContent).toBe('WLAN-Zugriff auf die Box');
+});
+
 test('renders cached TXT content as text rather than HTML', async () => {
     const match = jest.fn().mockResolvedValue({
         text: async () => '<script>bad()</script> Sample',

@@ -5,7 +5,8 @@ import { renderMarkdown } from './markdown/markdown';
 
 const renderDocument = async (
     url: string,
-    response: Response
+    response: Response,
+    localOnly = false
 ): Promise<HTMLElement> => {
     const article = document.createElement('article');
     const link = document.createElement('a');
@@ -13,7 +14,7 @@ const renderDocument = async (
     link.textContent = '📄 ' + decodeURIComponent(url.split('/').pop() || url);
     const badge = document.createElement('span');
     badge.className = 'pwa-document-badge';
-    badge.textContent = '✓ Offline';
+    badge.textContent = localOnly ? 'Auf dieser Box' : '✓ Offline';
     article.append(link, badge);
     if (/\.txt$/i.test(url)) {
         const preview = document.createElement('pre');
@@ -27,20 +28,20 @@ const renderDocument = async (
 };
 
 /** 🎯 Read and display documents from the active offline cache. */
-export const showDocuments = async (status: PwaStatus): Promise<void> => {
+export const showDocuments = async (status: PwaStatus, localOnly = false): Promise<void> => {
     const container = document.querySelector('[data-pwa-documents]');
-    const cache = await caches.open(status.cacheName);
+    const cache = localOnly ? null : await caches.open(status.cacheName);
     const documents = await Promise.all(
         status.documents.map(async (url) => {
             try {
-                let response = await cache.match(url);
+                let response = await cache?.match(url);
                 if (!response) {
                     const fresh = await fetch(url);
                     if (!fresh.ok || fresh.status !== 200) return null;
-                    await cache.put(url, fresh.clone());
+                    if (cache) await cache.put(url, fresh.clone());
                     response = fresh;
                 }
-                return await renderDocument(url, response);
+                return await renderDocument(url, response, localOnly);
             } catch {
                 return null;
             }
@@ -53,11 +54,11 @@ export const showDocuments = async (status: PwaStatus): Promise<void> => {
     const complete = count === status.documents.length;
     setStatus(
         '[data-pwa-documents-status]',
-        `▤ ${count}/${status.documents.length} gesichert`
+        localOnly ? `▤ ${count}/${status.documents.length} auf der Box` : `▤ ${count}/${status.documents.length} gesichert`
     );
     setStatus(
         '[data-pwa-offline]',
-        complete
+        localOnly ? 'WLAN-Zugriff auf die Box' : complete
             ? `✓ ${count} offline`
             : `⚠ ${count}/${status.documents.length} offline`
     );

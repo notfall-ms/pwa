@@ -1,4 +1,26 @@
-# XXX-XXX
+# NotfallMS PWA
+
+The single maintained source for the NotfallMS citizen website and Wi-Fi kiosk.
+Device firmware lives in [notfall-ms/firmware](https://github.com/notfall-ms/firmware)
+(currently private); project coordination is in [notfall-ms/general](https://github.com/notfall-ms/general).
+
+```sh
+npm ci
+npm test -- --coverage=false
+npm run build        # normal HTTPS website
+npm run build:kiosk  # self-contained local HTTP box, automatic /ws connection
+```
+
+Both builds produce `_site/` from the same source. Build output is generated and
+must not be maintained as another copy of the PWA. See [Kiosk integration](docs/kiosk.md).
+
+The local HTTP/WebSocket integration was developed by Georg Wilhelm (`Lafarik`)
+as part of the NotfallMS hackathon project, initially in `Lafarik/SafeMS` while
+organization access was being established, and integrated here on 2026-09-27.
+The PWA originated in this repository; existing authors and licensing are retained.
+
+## Original project references
+
 
 [![Wallaby.js](https://img.shields.io/badge/wallaby.js-powered-blue.svg?style=flat&logo=github)](https://wallabyjs.com/oss/)
 

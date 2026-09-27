@@ -5,6 +5,11 @@
     border-radius: 0 0.7rem 0.7rem 0;
     background: #fff8e9;
 }
+
+/* Author display rules must not reveal controls hidden in the HTTP kiosk. */
+.pager [hidden] {
+    display: none !important;
+}
 .pager-message h3 {
     font-size: 1rem;
     font-weight: 700;

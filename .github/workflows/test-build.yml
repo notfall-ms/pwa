@@ -1,0 +1,31 @@
+name: PWA tests and build profiles
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --coverage=false
+      - run: npm run build
+      - name: Normal website has no kiosk mode
+        run: test ! -f _site/kiosk-info.json && ! grep -q 'name="notfall-ms-kiosk"' _site/index.html
+      - run: npm run build:kiosk
+      - name: Kiosk profile is self-contained
+        run: test -f _site/kiosk-info.json && grep -q 'name="notfall-ms-kiosk"' _site/index.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notfall-ms-kiosk
+          path: _site/
+          retention-days: 14

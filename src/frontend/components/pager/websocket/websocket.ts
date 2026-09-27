@@ -28,7 +28,8 @@ export const validateSocketUrl = (value: string): string => {
 export const createWebSocketPager = (
     onMessages: (messages: PagerMessage[]) => void,
     onDisconnect: () => void,
-    onDiagnostic?: (entry: BluetoothDiagnostic) => void
+    onDiagnostic?: (entry: BluetoothDiagnostic) => void,
+    options: { snapshot?: boolean } = {}
 ) => {
     let socket: WebSocket | undefined;
     let pending:
@@ -39,7 +40,7 @@ export const createWebSocketPager = (
               timer: number;
           }
         | undefined;
-    let ackState: 'pending' | 'sent' = 'pending';
+    let ackState: 'pending' | 'sent' | 'unavailable' = 'pending';
     const report = (
         state: BluetoothDiagnostic['state'],
         detail: string
@@ -126,6 +127,14 @@ export const createWebSocketPager = (
             current.onmessage = (event: MessageEvent) => {
                 if (socket !== current) return;
                 try {
+                    if (
+                        options.snapshot &&
+                        ((typeof event.data === 'string' &&
+                            event.data.length > 8192) ||
+                            (event.data instanceof ArrayBuffer &&
+                                event.data.byteLength > 8192))
+                    )
+                        throw new Error('WebSocket-Feed zu groß.');
                     const text =
                         typeof event.data === 'string'
                             ? event.data
@@ -137,39 +146,68 @@ export const createWebSocketPager = (
                     if (text === undefined)
                         throw new Error('Unbekanntes WebSocket-Datenformat.');
                     const messages = parseMessages(JSON.parse(text));
-                    const inbox = saveReceived(messages);
-                    ackState = 'pending';
+                    if (options.snapshot && messages.length > 8)
+                        throw new Error('Zu viele Meldungen im Box-Feed.');
+                    let inbox: ReturnType<typeof saveReceived> | undefined;
                     try {
-                        for (const messageId of inbox.pendingAcks) {
-                            if (current.readyState !== WebSocket.OPEN)
-                                throw new Error('Verbindung vor ACK getrennt.');
-                            current.send(
-                                JSON.stringify({
-                                    messageId,
-                                    deviceId: inbox.deviceId,
-                                    status: 'received',
-                                    timestamp: new Date().toISOString(),
-                                })
-                            );
-                        }
-                        // send() only queues bytes. Retain ACKs for retry; no server receipt is defined.
-                        ackState = 'sent';
-                    } catch {
+                        inbox = saveReceived(messages);
+                    } catch (error) {
+                        if (!options.snapshot) throw error;
                         report(
                             'error',
-                            'ACK konnte nicht gesendet werden; Nachricht bleibt gespeichert.'
+                            'Lokaler Speicher nicht verfügbar; Meldungen werden nur in dieser Sitzung angezeigt, ohne ACK.'
                         );
                     }
+                    ackState = 'pending';
+                    if (!inbox) ackState = 'unavailable';
+                    else
+                        try {
+                            const currentIds = new Set(
+                                messages.map((message) => message.id)
+                            );
+                            for (const messageId of inbox.pendingAcks) {
+                                // A kiosk snapshot never acknowledges unrelated BLE or old-box history.
+                                if (
+                                    options.snapshot &&
+                                    !currentIds.has(messageId)
+                                )
+                                    continue;
+                                if (current.readyState !== WebSocket.OPEN)
+                                    throw new Error(
+                                        'Verbindung vor ACK getrennt.'
+                                    );
+                                current.send(
+                                    JSON.stringify({
+                                        messageId,
+                                        deviceId: inbox.deviceId,
+                                        status: 'received',
+                                        timestamp: new Date().toISOString(),
+                                    })
+                                );
+                            }
+                            // send() only queues bytes. Retain ACKs for retry; no server receipt is defined.
+                            ackState = 'sent';
+                        } catch {
+                            report(
+                                'error',
+                                'ACK konnte nicht gesendet werden; Nachricht bleibt gespeichert.'
+                            );
+                        }
                     report(
                         'ok',
-                        `${messages.length} Nachrichten verarbeitet und lokal gespeichert.`
+                        inbox
+                            ? `${messages.length} Nachrichten verarbeitet und lokal gespeichert.`
+                            : `${messages.length} Nachrichten in dieser Sitzung angezeigt.`
                     );
+                    const displayed = options.snapshot
+                        ? messages
+                        : inbox!.messages;
                     if (pending) {
                         window.clearTimeout(pending.timer);
-                        pending.resolve(inbox.messages);
+                        pending.resolve(displayed);
                         pending = undefined;
                     }
-                    onMessages(inbox.messages);
+                    onMessages(displayed);
                 } catch {
                     fail(
                         new Error(

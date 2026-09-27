@@ -11,4 +11,4 @@ export const listFiles = (directory: string): string[] =>
 
 /** 🎯 Encode a relative file path as a URL. */
 export const toUrl = (path: string): string =>
-    '/' + path.split('/').map(encodeURIComponent).join('/');
+    '/' + path.replace(/\\/g, '/').split('/').map(encodeURIComponent).join('/');

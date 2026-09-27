@@ -227,3 +227,82 @@ test('rejects invalid protocols and credentials', () => {
         'wss://example.test/ws'
     );
 });
+
+test('kiosk displays only the current snapshot and acknowledges no unrelated inbox history', async () => {
+    saveReceived([{ ...message, id: 'other-box-or-bluetooth' }]);
+    const received = jest.fn();
+    const pager = createWebSocketPager(received, jest.fn(), undefined, {
+        snapshot: true,
+    });
+    const result = pager.connect(defaultSocketUrl());
+    const socket = Socket.instances[0];
+    socket.open();
+    socket.feed();
+    expect(await result).toEqual([message]);
+    const acks = socket.send.mock.calls
+        .map(([data]) => JSON.parse(data))
+        .filter((data) => data.messageId);
+    expect(acks.map((ack) => ack.messageId)).toEqual([message.id]);
+    socket.send.mockClear();
+    socket.feed({ messages: [] });
+    expect(received).toHaveBeenLastCalledWith([]);
+    expect(socket.send).not.toHaveBeenCalled();
+    expect(readInbox()!.messages).toHaveLength(2);
+});
+
+test.each(['getItem', 'setItem'] as const)(
+    'kiosk keeps a valid live feed in RAM without ACK if %s fails',
+    async (method) => {
+        const received = jest.fn();
+        const diagnostic = jest.fn();
+        const pager = createWebSocketPager(received, jest.fn(), diagnostic, {
+            snapshot: true,
+        });
+        const result = pager.connect(defaultSocketUrl());
+        const socket = Socket.instances[0];
+        socket.open();
+        socket.send.mockClear();
+        jest.spyOn(Storage.prototype, method).mockImplementation(() => {
+            throw new Error('Storage unavailable');
+        });
+        socket.feed();
+        expect(await result).toEqual([message]);
+        expect(received).toHaveBeenCalledWith([message]);
+        expect(socket.send).not.toHaveBeenCalled();
+        expect(pager.ackStatus()).toBe('unavailable');
+        expect(diagnostic).toHaveBeenCalledWith(
+            expect.objectContaining({
+                state: 'error',
+                detail: expect.stringContaining('ohne ACK'),
+            })
+        );
+        socket.feed({ messages: [] });
+        expect(received).toHaveBeenLastCalledWith([]);
+    }
+);
+
+test.each(['bytes', 'count'])(
+    'kiosk rejects an oversized snapshot: %s',
+    async (kind) => {
+        const received = jest.fn();
+        const pager = createWebSocketPager(received, jest.fn(), undefined, {
+            snapshot: true,
+        });
+        const result = pager.connect(defaultSocketUrl());
+        const rejected = expect(result).rejects.toThrow('ungültig');
+        const socket = Socket.instances[0];
+        socket.open();
+        socket.send.mockClear();
+        if (kind === 'bytes') socket.onmessage!({ data: ' '.repeat(8193) });
+        else
+            socket.feed({
+                messages: Array.from({ length: 9 }, (_, i) => ({
+                    ...message,
+                    id: String(i),
+                })),
+            });
+        await rejected;
+        expect(received).not.toHaveBeenCalled();
+        expect(socket.send).not.toHaveBeenCalled();
+    }
+);
